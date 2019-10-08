@@ -1,0 +1,6 @@
+name: RSWeapon
+main: weapon.RsWeapon
+version: 1.1.7
+author: 若水
+api: 1.0.8
+load: STARTUP
