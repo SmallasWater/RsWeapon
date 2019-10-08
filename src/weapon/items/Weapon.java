@@ -196,7 +196,7 @@ public class Weapon extends BaseItem {
 
     @Override
     public Item toItem() {
-        Item item = this.item.clone();
+        Item item = Item.get(this.item.getId(),this.item.getDamage());
         item = getItemName(item,getCompoundTag(),this.name,tagName);
         item.setLore(lore());
         item.addEnchantment(this.item.getEnchantments());
@@ -354,7 +354,7 @@ public class Weapon extends BaseItem {
                 EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(),true);
                 int add = RsWeapon.getInstance().getUpDataAttribute();
                 if(add > 0){
-                    this.kick += add / 10;
+                    this.kick += (double) (add / 10);
                     this.min += add;
                     this.max += add;
                 }

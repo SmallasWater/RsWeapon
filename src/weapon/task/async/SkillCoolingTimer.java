@@ -17,10 +17,10 @@ public class SkillCoolingTimer extends AsyncTask {
 
     @Override
     public void onRun() {
-        LinkedList<BaseEffect> playerEffect = effects.getEffects();
-        if(playerEffect != null && playerEffect.size() > 0){
+        LinkedList<BaseEffect> playerEffects = effects.getEffects();
+        if(playerEffects != null && playerEffects.size() > 0){
             try {
-                for (BaseEffect effect:playerEffect){
+                for (BaseEffect effect:playerEffects){
                     if(effect.getCold() > 0){
                         effect.setCold(effect.getCold() - 1);
                     }else{
@@ -28,7 +28,7 @@ public class SkillCoolingTimer extends AsyncTask {
                     }
                 }
             }catch (Exception e){
-                effects.setEffects(playerEffect);
+                effects.setEffects(playerEffects);
             }
 
         }

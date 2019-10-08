@@ -30,10 +30,9 @@ public class PlayerEffects {
     }
 
     public void addEffect(BaseEffect effect){
-        if(containsEffect(effect)){
-            effects.remove(effect);
+        if(!containsEffect(effect)){
+            effects.add(effect);
         }
-        effects.add(effect);
     }
 
 
@@ -43,9 +42,17 @@ public class PlayerEffects {
 
 
     public boolean containsEffect(BaseEffect effect){
-        for(BaseEffect baseEffect:effects){
-            if(baseEffect.equals(effect)){
-                return true;
+        if(effect != null){
+            if(effects != null){
+                try {
+                    for(BaseEffect baseEffect:effects){
+                        if(baseEffect.equals(effect)){
+                            return true;
+                        }
+                    }
+                }catch (Exception e){
+                    return false;
+                }
             }
         }
         return false;
@@ -75,4 +82,17 @@ public class PlayerEffects {
         return player;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for(BaseEffect effect:effects){
+            builder.append("Buffer")
+                    .append(effect.getClass().getName())
+                    .append(" load: ")
+                    .append(effect.getTime())
+                    .append(" cold: ")
+                    .append(effect.getTime());
+        }
+        return builder.toString();
+    }
 }

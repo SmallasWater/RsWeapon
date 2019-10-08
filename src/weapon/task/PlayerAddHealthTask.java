@@ -65,7 +65,7 @@ public class PlayerAddHealthTask extends Task {
             }else{
                 if (Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null) {
                         RsWeapon.playerHealth.remove(player.getName());
-                        defaultAPI.removePlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player));
+                        defaultAPI.removePlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player.getName()));
                         RsWeapon.addHealth.remove(player.getName());
                     }
                 this.cancel();

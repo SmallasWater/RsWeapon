@@ -354,7 +354,7 @@ public class Armor extends BaseItem{
                 if(add > 0){
                     this.armor += add;
                     this.health += add;
-                    this.dKick += add / 10;
+                    this.dKick += (double) (add / 10);
                     this.toDamage += add;
                 }
                 toUpData(tagName);

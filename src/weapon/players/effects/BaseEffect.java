@@ -40,4 +40,9 @@ public abstract class BaseEffect implements Cloneable{
 
     @Override
     public boolean equals(Object obj) {return false;}
+
+    @Override
+    public String toString() {
+        return "Buff"+getClass().getName()+" load: "+getTime()+" time: "+getCold();
+    }
 }

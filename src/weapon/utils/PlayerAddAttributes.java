@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class PlayerAddAttributes {
 
-    private static LinkedList<BaseItem> getItems(Player player){
+    public static LinkedList<BaseItem> getItems(Player player){
         LinkedList<BaseItem> items = new LinkedList<>();
         Item item = player.getInventory().getItemInHand();
         if(Weapon.isWeapon(item)){

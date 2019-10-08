@@ -1,5 +1,6 @@
 package weapon.task.async;
 
+
 import cn.nukkit.scheduler.AsyncTask;
 import weapon.players.PlayerEffects;
 import weapon.players.effects.BaseEffect;
@@ -17,10 +18,10 @@ public class SkillDamageTimer extends AsyncTask {
 
     @Override
     public void onRun() {
-        LinkedList<BaseEffect> playerEffect = effects.getEffects();
-        if(playerEffect != null && playerEffect.size() > 0){
+        LinkedList<BaseEffect> playerEffects = effects.getEffects();
+        if(playerEffects != null && playerEffects.size() > 0){
             try {
-                for (BaseEffect effect : playerEffect) {
+                for (BaseEffect effect : playerEffects) {
                     if (effect instanceof PlayerEffect) {
                         if (((PlayerEffect) effect).getBufferName().equals(PlayerEffect.ICE)) {
                             if (effect.getTime() > 0) {
@@ -32,7 +33,7 @@ public class SkillDamageTimer extends AsyncTask {
                     }
                 }
             }catch (Exception e){
-                effects.setEffects(playerEffect);
+                effects.setEffects(playerEffects);
             }
         }
     }
