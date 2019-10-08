@@ -8,7 +8,6 @@ import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.entity.EntityArmorChangeEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
@@ -42,7 +41,7 @@ public class OnListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        RsWeapon.playerHealth.put(player, player.getMaxHealth());
+        RsWeapon.playerHealth.put(player.getName(), player.getMaxHealth());
         Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddHealthTask(player),20);
 
     }
@@ -51,17 +50,17 @@ public class OnListener implements Listener {
     public void onDamage(EntityDamageEvent event){
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
-            Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
-            if(damager instanceof Player){
-                Item item = ((Player) damager).getInventory().getItemInHand();
+            Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
+            if(damagePlayer instanceof Player){
+                Item item = ((Player) damagePlayer).getInventory().getItemInHand();
                 if(Weapon.isWeapon(item)){
                     float damage = event.getDamage();
-                    LinkedList<BaseEffect> damageEffects = PlayerAddAttributes.getDamages((Player) damager);
-                    damage += PlayerAddAttributes.getDamage((Player) damager);
-                    double kick = PlayerAddAttributes.getKick((Player) damager);
+                    LinkedList<BaseEffect> damageEffects = PlayerAddAttributes.getDamages((Player) damagePlayer);
+                    damage += PlayerAddAttributes.getDamage((Player) damagePlayer);
+                    double kick = PlayerAddAttributes.getKick((Player) damagePlayer);
                     event.setDamage( damage);
                     ((EntityDamageByEntityEvent) event).setKnockBack((float) kick);
-                    PlayerEffects playerEffects = PlayerEffects.getInstance(damager.getName());
+                    PlayerEffects playerEffects = PlayerEffects.getInstance(damagePlayer.getName());
                     for (BaseEffect baseEffect:damageEffects){
                         if(baseEffect instanceof PlayerEffect){
                             if(!playerEffects.containsEffect(baseEffect)){
@@ -70,26 +69,26 @@ public class OnListener implements Listener {
                                     if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.ICE)){
                                         playerEffects2.addEffect(((PlayerEffect) baseEffect).clone());
                                         playerEffects.addEffect(((PlayerEffect) baseEffect).clone());
-                                        ((Player) damager).sendTip(TextFormat.AQUA + "冰冻触发 持续" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
+                                        ((Player) damagePlayer).sendTip(TextFormat.AQUA + "冰冻触发 持续" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
 
                                     }
                                 }
                                 if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.FRAME)){
                                     playerEffects.addEffect(((PlayerEffect) baseEffect).clone());
                                     entity.setOnFire(baseEffect.getTime());
-                                    ((Player) damager).sendTip(TextFormat.RED + "引燃触发 持续" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
+                                    ((Player) damagePlayer).sendTip(TextFormat.RED + "引燃触发 持续" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
                                 }
-                                if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.ADDHEALTH)){
+                                if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.ADD_HEALTH)){
                                     playerEffects.addEffect(((PlayerEffect) baseEffect).clone());
                                     float d = event.getDamage() *  baseEffect.getTime() / 100;
-                                    damager.setHealth(damager.getHealth() + d);
-                                    Effects.addHealth(damager);
-                                    ((Player) damager).sendTip(TextFormat.RED + "吸血触发 血量 +"+d+" 冷却 " +baseEffect.getCold() + " 秒");
+                                    damagePlayer.setHealth(damagePlayer.getHealth() + d);
+                                    Effects.addHealth(damagePlayer);
+                                    ((Player) damagePlayer).sendTip(TextFormat.RED + "吸血触发 血量 +"+d+" 冷却 " +baseEffect.getCold() + " 秒");
                                 }
                                 if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.LIGHTNING)){
                                     playerEffects.addEffect(((PlayerEffect) baseEffect).clone());
                                     toLight(baseEffect.getTime(),entity);
-                                    ((Player) damager).sendTip(TextFormat.RED + "雷击触发 伤害:" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
+                                    ((Player) damagePlayer).sendTip(TextFormat.RED + "雷击触发 伤害:" + baseEffect.getTime() + "冷却 " +baseEffect.getCold() + " 秒");
                                 }
                             }
                         }
@@ -99,7 +98,7 @@ public class OnListener implements Listener {
                                 if (!entity.hasEffect(((MineCraftEffect) baseEffect).getEffect().getId())) {
                                     Effect effect = ((MineCraftEffect) baseEffect).getEffect();
                                     entity.addEffect(((MineCraftEffect) baseEffect).getEffect());
-                                    ((Player) damager).sendTip(TextFormat.RED + BaseItem.getEffectStringById(effect.getId())
+                                    ((Player) damagePlayer).sendTip(TextFormat.RED + BaseItem.getEffectStringById(effect.getId())
                                             + BaseItem.getLevelByString(effect.getAmplifier()) + "触发 持续:" + baseEffect.getTime() + "冷却 " + baseEffect.getCold() + " 秒");
                                 }
                             }
@@ -107,6 +106,15 @@ public class OnListener implements Listener {
                     }
                 }
             }
+
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntity(EntityDamageEvent event){
+        if(event instanceof EntityDamageByEntityEvent){
+            Entity entity = event.getEntity();
+            Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
             if(entity instanceof Player){
                 if(event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
                     return;
@@ -141,14 +149,13 @@ public class OnListener implements Listener {
                 }
                 if(toDamage > 0){
                     float toD = damage * toDamage / 100;
-                    damager.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
+                    damagePlayer.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
                 }
                 event.setDamage(damage);
                 ((EntityDamageByEntityEvent) event).setKnockBack(kick);
             }
         }
     }
-
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event){

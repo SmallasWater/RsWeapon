@@ -1,5 +1,7 @@
 package weapon;
 
+import AwakenSystem.data.baseAPI;
+import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.PluginBase;
@@ -40,9 +42,9 @@ public class RsWeapon extends PluginBase {
 
     public static LinkedList<ItemLevel> levels = new LinkedList<>();
 
-    public static LinkedHashMap<Player,Integer> playerHealth = new LinkedHashMap<>();
+    public static LinkedHashMap<String,Integer> playerHealth = new LinkedHashMap<>();
 
-    public static LinkedHashMap<Player,Integer> addHealth = new LinkedHashMap<>();
+    public static LinkedHashMap<String,Integer> addHealth = new LinkedHashMap<>();
 
     public static LinkedHashMap<String , GemStone> GemStones = new LinkedHashMap<>();
 
@@ -139,4 +141,13 @@ public class RsWeapon extends PluginBase {
         return getConfig().getInt("强化消耗金币",5000);
     }
 
+    @Override
+    public void onDisable() {
+        for (String playerName: addHealth.keySet()) {
+            if (Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null) {
+                defaultAPI.removePlayerAttributeInt(playerName, baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(playerName));
+                RsWeapon.addHealth.remove(playerName);
+            }
+        }
+    }
 }

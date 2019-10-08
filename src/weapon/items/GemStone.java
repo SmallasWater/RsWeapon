@@ -1,7 +1,6 @@
 package weapon.items;
 
 
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
@@ -27,7 +26,7 @@ public class GemStone extends BaseItem{
             add(PlayerEffect.ICE);
             add(PlayerEffect.FRAME);
             add(PlayerEffect.FRAME);
-            add(PlayerEffect.ADDHEALTH);
+            add(PlayerEffect.ADD_HEALTH);
             add(PlayerEffect.LIGHTNING);
         }
     };
@@ -122,9 +121,9 @@ public class GemStone extends BaseItem{
             effects.add(new PlayerEffect(PlayerEffect.SHIELD,(int)f.get("抵抗伤害(%)"),(int)f.get("冷却(s)")));
         }
 
-        Map addHealth = (Map) config.get(PlayerEffect.ADDHEALTH);
+        Map addHealth = (Map) config.get(PlayerEffect.ADD_HEALTH);
         if(addHealth.containsKey("吸收伤害(%)") &&(int)addHealth.get("吸收伤害(%)") > 0){
-            damageEffect.add(new PlayerEffect(PlayerEffect.ADDHEALTH,(int)addHealth.get("吸收伤害(%)"),(int)addHealth.get("冷却(s)")));
+            damageEffect.add(new PlayerEffect(PlayerEffect.ADD_HEALTH,(int)addHealth.get("吸收伤害(%)"),(int)addHealth.get("冷却(s)")));
         }
 
         Map eff = (Map) config.get("药水");
@@ -179,7 +178,7 @@ public class GemStone extends BaseItem{
         return linkedList;
     }
 
-    public double getdKick() {
+    public double getDKick() {
         return dKick;
     }
 
@@ -249,6 +248,10 @@ public class GemStone extends BaseItem{
         return false;
     }
 
+    @Override
+    public boolean canUpData() {
+        return false;
+    }
 
     public static String getGemStoneName(Item item){
         if(GemStone.isGemStone(item)){

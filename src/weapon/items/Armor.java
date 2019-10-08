@@ -3,7 +3,6 @@ package weapon.items;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemColorArmor;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
@@ -85,7 +84,7 @@ public class Armor extends BaseItem{
         this.rgb = new BlockColor(tag.getInt(tagName+"rgb"));
         this.unBreak = tag.contains("Unbreakable");
         ListTag tags = tag.getList(tagName+"Gem");
-        gemStoneLinkedList = this.getGemStonByTag(tags);
+        gemStoneLinkedList = this.getGemStoneByTag(tags);
 
     }
 
@@ -113,7 +112,7 @@ public class Armor extends BaseItem{
         return count;
     }
 
-    public double getdKick() {
+    public double getDKick() {
         return dKick;
     }
 
@@ -167,9 +166,9 @@ public class Armor extends BaseItem{
     private String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§6◈类型:   ◈§e盔甲");
-        lore.add("§r§l§6◈耐久:   ◈"+(unBreak?"§d无限":"§c会损坏"));
-        lore.add("§r§l§6◈品阶:   ◈"+RsWeapon.levels.get(level).getName());
+        lore.add("§r§l§6◈类型   ◈§e盔甲");
+        lore.add("§r§l§6◈耐久   ◈"+(unBreak?"§d无限":"§c会损坏"));
+        lore.add("§r§l§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
         lore.add("§r§l§f═§7╞════════════╡§f═");
         lore.add("§r§l"+message);
         lore.add("§r§l§f═§7╞════════════╡§f═");
@@ -290,9 +289,9 @@ public class Armor extends BaseItem{
 
     public void inlayStone(GemStone stone){
         if(canInlay(stone)){
-            this.armor += stone.getKick();
+            this.armor += stone.getArmor();
             this.health += stone.getHealth();
-            this.dKick += stone.getdKick();
+            this.dKick += stone.getDKick();
             this.toDamage += stone.getToDamage();
             gemStoneLinkedList.add(stone);
         }
@@ -301,16 +300,16 @@ public class Armor extends BaseItem{
 
     public void removeStone(GemStone stone){
         if(canRemove(stone)){
-            this.armor -= stone.getKick();
+            this.armor -= stone.getArmor();
             this.health -= stone.getHealth();
-            this.dKick -= stone.getdKick();
+            this.dKick -= stone.getDKick();
             this.toDamage -= stone.getToDamage();
             gemStoneLinkedList.remove(stone);
         }
     }
 
     public boolean canInlay(GemStone stone){
-        if(stone.getxItem().contains(this.getType())){
+        if(exit(stone.getxItem(),getType())){
             if(gemStoneLinkedList.contains(stone)){
                 return false;
             }else{
@@ -322,6 +321,8 @@ public class Armor extends BaseItem{
         return false;
     }
 
+
+
     public boolean canRemove(GemStone stone){
         return gemStoneLinkedList.contains(stone);
 
@@ -331,9 +332,9 @@ public class Armor extends BaseItem{
     public boolean canUpData() {
         CompoundTag tag = this.item.getNamedTag();
         if(tag.contains(tagName+"upData")){
-            return tag.getInt(tagName + "upData") != RsWeapon.getInstance().getUpDataLevel();
+            return tag.getInt(tagName + "upData") == RsWeapon.getInstance().getUpDataLevel();
         }
-        return true;
+        return false;
     }
 
     public boolean upData(Player player){
@@ -343,7 +344,7 @@ public class Armor extends BaseItem{
             player.sendMessage("§r§c抱歉 您的金钱不足 无法强化");
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
         }else{
-            if(!canUpData()){
+            if(canUpData()){
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§c抱歉 此盔甲无法强化");
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");

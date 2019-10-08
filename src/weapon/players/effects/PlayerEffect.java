@@ -9,7 +9,7 @@ public class PlayerEffect extends BaseEffect {
 
     public static final String SHIELD = "防护盾";
 
-    public static final String ADDHEALTH = "吸血";
+    public static final String ADD_HEALTH = "吸血";
 
     public static final String LIGHTNING = "雷击";
 

@@ -3,7 +3,6 @@ package weapon.utils;
 
 
 import cn.nukkit.level.Position;
-import cn.nukkit.level.particle.EnchantParticle;
 import cn.nukkit.level.particle.FlameParticle;
 import cn.nukkit.level.particle.HappyVillagerParticle;
 import cn.nukkit.math.Vector3;

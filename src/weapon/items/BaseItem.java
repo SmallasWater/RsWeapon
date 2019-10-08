@@ -51,7 +51,7 @@ public abstract class BaseItem {
         tag.putList(tagListTag);
         return tag;
     }
-    LinkedList<GemStone> getGemStonByTag(ListTag tags){
+    LinkedList<GemStone> getGemStoneByTag(ListTag tags){
         LinkedList<GemStone> stones = new LinkedList<>();
         if(tags != null){
             List list = tags.getAll();
@@ -196,6 +196,15 @@ public abstract class BaseItem {
             item.setCustomName(name+"  §c+"+tag.getInt(tagName+"upData"));
         }
         return item;
+    }
+
+    boolean exit(LinkedList<String> list,String type){
+        for (String s:list){
+            if(s.equals(type)){
+                return true;
+            }
+        }
+        return false;
     }
 
 

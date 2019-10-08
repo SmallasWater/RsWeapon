@@ -135,7 +135,6 @@ public class WeCommand extends Command {
                     default:
                         break;
                 }
-
             }
         }catch (ArrayIndexOutOfBoundsException e){
             return false;

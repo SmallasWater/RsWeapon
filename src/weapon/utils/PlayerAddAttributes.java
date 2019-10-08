@@ -1,7 +1,6 @@
 package weapon.utils;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import weapon.items.Armor;
 
@@ -86,7 +85,7 @@ public class PlayerAddAttributes {
         if(items.size() > 0){
             for (BaseItem item:items){
                 if(item instanceof Armor){
-                    armor += ((Armor) item).getdKick();
+                    armor += ((Armor) item).getDKick();
                 }
             }
         }

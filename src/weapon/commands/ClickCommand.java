@@ -94,7 +94,7 @@ public class ClickCommand extends Command {
     }
 
 
-    private boolean canRemoveitem(Player player, String itemName){
+    private boolean canRemoveItem(Player player, String itemName){
         for (Item item:player.getInventory().getContents().values()){
             if(GemStone.isGemStone(item)){
                 GemStone stone = GemStone.getInstance(item);
@@ -109,7 +109,7 @@ public class ClickCommand extends Command {
     }
 
     private void inviteStone(Player sender, String stoneName, BaseItem item){
-        if(canRemoveitem(sender,stoneName)){
+        if(canRemoveItem(sender,stoneName)){
             GemStone stone = GemStone.getInstance(stoneName);
             if(item != null){
                 if(stone != null){

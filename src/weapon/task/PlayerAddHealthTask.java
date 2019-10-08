@@ -23,50 +23,50 @@ public class PlayerAddHealthTask extends Task {
     public void onRun(int i) {
         try {
             if(player.isOnline()){
-                if(RsWeapon.playerHealth.containsKey(player)){
-                    int health = PlayerAddAttributes.getHealth((Player) player);
+                if(RsWeapon.playerHealth.containsKey(player.getName())){
+                    int health = PlayerAddAttributes.getHealth(player);
                     if(health > 0){
                         if (Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null) {
                             if(this.health == 0){
                                 this.health = health;
-                                RsWeapon.addHealth.put(player,health);
+                                RsWeapon.addHealth.put(player.getName(),health);
                                 defaultAPI.addPlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,(health));
                                 player.attack(0.1F);
                             }else if(this.health != health){
-                                RsWeapon.addHealth.put(player,health);
+                                RsWeapon.addHealth.put(player.getName(),health);
                                 defaultAPI.removePlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,(this.health));
                                 defaultAPI.addPlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,(health));
                                 this.health = health;
                                 player.attack(0.1F);
                             }else{
-                                RsWeapon.addHealth.put(player,health);
+                                RsWeapon.addHealth.put(player.getName(),health);
                             }
                         } else {
-                            if(player.getMaxHealth() != RsWeapon.playerHealth.get(player)+ health){
-                                player.setMaxHealth(RsWeapon.playerHealth.get(player)+ health);
+                            if(player.getMaxHealth() != RsWeapon.playerHealth.get(player.getName())+ health){
+                                player.setMaxHealth(RsWeapon.playerHealth.get(player.getName())+ health);
                             }
                         }
                     }else{
                         if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
-                            if(RsWeapon.addHealth.containsKey(player)){
+                            if(RsWeapon.addHealth.containsKey(player.getName())){
                                 this.health = health;
                                 defaultAPI.removePlayerAttributeInt(player.getName(),
-                                        baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player));
-                                RsWeapon.addHealth.remove(player);
+                                        baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player.getName()));
+                                RsWeapon.addHealth.remove(player.getName());
                                 player.attack(0.1F);
                             }
                         }else{
-                            if(player.getMaxHealth() != RsWeapon.playerHealth.get(player)+ health){
-                                player.setMaxHealth(RsWeapon.playerHealth.get(player)+ health);
+                            if(player.getMaxHealth() != RsWeapon.playerHealth.get(player.getName())+ health){
+                                player.setMaxHealth(RsWeapon.playerHealth.get(player.getName())+ health);
                             }
                         }
                     }
                 }
             }else{
                 if (Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null) {
-                        RsWeapon.addHealth.remove(player, health);
-                        RsWeapon.playerHealth.remove(player);
-                        defaultAPI.removePlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,(this.health));
+                        RsWeapon.playerHealth.remove(player.getName());
+                        defaultAPI.removePlayerAttributeInt(player.getName(), baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player));
+                        RsWeapon.addHealth.remove(player.getName());
                     }
                 this.cancel();
             }

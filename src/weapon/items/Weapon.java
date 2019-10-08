@@ -160,7 +160,7 @@ public class Weapon extends BaseItem {
         this.name = name;
     }
 
-    public String getType() {
+    private String getType() {
         return type;
     }
 
@@ -216,9 +216,9 @@ public class Weapon extends BaseItem {
     private String[] lore(){//13
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§6◈类型:  §6◈§a武器");
-        lore.add("§r§l§6◈耐久  :§6◈"+(unBreak?"§d无限":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
-        lore.add("§r§l§6◈品阶:  §6◈"+RsWeapon.levels.get(level).getName());
+        lore.add("§r§l§6◈类型   §6◈§a武器");
+        lore.add("§r§l§6◈耐久   §6◈"+(unBreak?"§d无限":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
+        lore.add("§r§l§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
         lore.add("§r§l§f═§7╞════════════╡§f═");
         lore.add("§r§l"+message);
         lore.add("§r§l§f═§7╞════════════╡§f═");
@@ -250,7 +250,7 @@ public class Weapon extends BaseItem {
         this.message = tag.getString(tagName+"message");
         this.unBreak = tag.contains("Unbreakable");
         ListTag tags = tag.getList(tagName+"Gem");
-        gemStoneLinkedList = this.getGemStonByTag(tags);
+        gemStoneLinkedList = this.getGemStoneByTag(tags);
     }
 
     public int getCount() {
@@ -323,7 +323,7 @@ public class Weapon extends BaseItem {
     }
 
     public boolean canInlay(GemStone stone){
-        if(stone.getxItem().contains(this.getType())){
+        if(exit(stone.getxItem(),getType())){
             if(gemStoneLinkedList.contains(stone)){
                 return false;
             }else{
@@ -346,7 +346,7 @@ public class Weapon extends BaseItem {
             player.sendMessage("§r§c抱歉 您的金钱不足 无法强化");
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
         }else{
-            if(!canUpData()){
+            if(canUpData()){
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§c抱歉 此武器无法强化");
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -372,8 +372,8 @@ public class Weapon extends BaseItem {
     public boolean canUpData() {
         CompoundTag tag = this.item.getNamedTag();
         if(tag.contains(tagName+"upData")){
-            return tag.getInt(tagName + "upData") != RsWeapon.getInstance().getUpDataLevel();
+            return tag.getInt(tagName + "upData") == RsWeapon.getInstance().getUpDataLevel();
         }
-        return true;
+        return false;
     }
 }
