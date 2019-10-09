@@ -287,28 +287,28 @@ public class GemStone extends BaseItem{
         return item;
     }
 
-    public String[] lore(){
+    private String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§f◈品阶:     ◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§l§f◈可镶嵌:   ◈"+xItem);
-        lore.add("§r§l§f◈限制品阶: ◈"+RsWeapon.levels.get(xLevel).getName());
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l"+message);
-        lore.add("§r§l§f═§7╞════════════╡§f═");
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r§6◈§f宝石品阶     §6◈"+RsWeapon.levels.get(level).getName());
+        lore.add("§r§6◈§f可镶嵌       §6◈"+xItem);
+        lore.add("§r§6◈§f限制品阶     §6◈"+RsWeapon.levels.get(xLevel).getName());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r"+message.trim());
+        lore.add("§r§f═§7╞════════════╡§f═");
         if(xItem.contains("武器")){
-            lore.add("§r§l§f†镶嵌武器†");
-            lore.add("   §r§l§f✎攻击力 ✎+§a"+min+"§f - §a+"+max);
-            lore.add("   §r§l§f☈击退    ☈+ §6"+kick);
+            lore.add("§r§f†镶嵌武器†");
+            lore.add("   §r§6◈§f攻击§6◈   +§a"+min+"§f - §a+"+max);
+            lore.add("   §r§6◈§f击退§6◈   +§a"+kick);
         }
         if(xItem.contains("盔甲")){
-            lore.add("§r§l§f†镶嵌盔甲†");
-            lore.add("   §r§l§f♥血量    ♥+§d"+health);
-            lore.add("   §r§l§f☂护甲    ☂+§e"+armor);
-            lore.add("   §r§l§f☽韧性     ☽+§4"+kick);
-            lore.add("   §r§l§f☀反伤    ☀+§2"+toDamage);
+            lore.add("§r§f†镶嵌盔甲†");
+            lore.add("   §r§6◈§f血量§6◈    +§d"+health);
+            lore.add("   §r§6◈§f护甲§6◈    +§e"+armor);
+            lore.add("   §r§6◈§f韧性§6◈    +§4"+kick);
+            lore.add("   §r§6◈§f反伤§6◈    +§2"+toDamage);
         }
-        lore.add("§r§l§f═§7╞════════════╡§f═");
+        lore.add("§r§f═§7╞════════════╡§f═");
         if(xItem.contains("武器")){
             lore.add("§r§l§f技能: §e(武器)");
             if(getWeaponEffect().size() > 0){
