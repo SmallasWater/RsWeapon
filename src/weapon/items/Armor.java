@@ -179,19 +179,19 @@ public class Armor extends BaseItem{
 
     private String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§6◈类型   ◈§e盔甲");
-        lore.add("§r§l§6◈耐久   ◈"+(unBreak?"§d无限":"§c会损坏"));
-        lore.add("§r§l§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l"+message);
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§7☂护甲:    +"+armor);
-        lore.add("§r§l§7☽韧性:    +"+dKick);
-        lore.add("§r§l§7♥血量:    +"+health);
-        lore.add("§r§l§7☀反伤:    +"+toDamage);
-        lore.add("§r§l§7☋宝石: "+getStoneString(gemStoneLinkedList));
-        lore.add("§r§l§f═§7╞════════════╡§f═");
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r§6◈类型   ◈§e盔甲");
+        lore.add("§r§6◈耐久   ◈"+(unBreak?"§7无限耐久":"§c会损坏"));
+        lore.add("§r§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r"+message.trim());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r§6◈§7护甲§6◈    §7+"+armor);
+        lore.add("§r§6◈§7韧性§6◈    §7+"+dKick);
+        lore.add("§r§6◈§7血量§6◈    §7+"+health);
+        lore.add("§r§6◈§7反伤§6◈    §7+"+toDamage);
+        lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
+        lore.add("§r§f═§7╞════════════╡§f═");
         if(gemStoneLinkedList.size() > 0){
             lore.add(skillToString(gemStoneLinkedList,false));
         }
