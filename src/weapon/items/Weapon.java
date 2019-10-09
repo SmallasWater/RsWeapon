@@ -207,17 +207,17 @@ public class Weapon extends BaseItem {
 
     private String[] lore(){//13
         ArrayList<String> lore = new ArrayList<>();
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§6◈类型   §6◈§a武器");
-        lore.add("§r§l§6◈耐久   §6◈"+(unBreak?"§d无限":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
-        lore.add("§r§l§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l"+message);
-        lore.add("§r§l§f═§7╞════════════╡§f═");
-        lore.add("§r§l§7✎攻击: "+min+" - "+max);
-        lore.add("§r§l§7☈击退: "+kick);
-        lore.add("§r§l§7☋宝石: "+getStoneString(gemStoneLinkedList));
-        lore.add("§r§l§f═§7╞════════════╡§f═");
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r§6◈类型   §6◈§a武器");
+        lore.add("§r§6◈耐久   §6◈"+(unBreak?"§7无限耐久":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
+        lore.add("§r§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r"+message.trim());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r§6◈§7攻击§6◈ §a"+min+" - "+max);
+        lore.add("§r§6◈§7击退§6◈ §a"+kick);
+        lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
+        lore.add("§r§6◈§f═§7╞════════════╡§f═");
         if(gemStoneLinkedList.size() > 0){
             lore.add(skillToString(gemStoneLinkedList,true));
         }
