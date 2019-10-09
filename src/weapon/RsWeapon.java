@@ -9,8 +9,10 @@ import cn.nukkit.utils.Config;
 import weapon.commands.ClickCommand;
 import weapon.commands.UpDataCommand;
 import weapon.commands.WeCommand;
+import weapon.items.Armor;
 import weapon.items.GemStone;
 import weapon.items.ItemLevel;
+import weapon.items.Weapon;
 import weapon.players.OnListener;
 import weapon.players.PlayerEffects;
 import weapon.task.FixPlayerInventoryTask;
@@ -48,6 +50,10 @@ public class RsWeapon extends PluginBase {
 
     public static LinkedHashMap<String , GemStone> GemStones = new LinkedHashMap<>();
 
+    public static LinkedHashMap<String, Weapon> CaCheWeapon = new LinkedHashMap<>();
+
+
+    public static LinkedHashMap<String, Armor> CaCheArmor = new LinkedHashMap<>();
 
 
 
@@ -76,9 +82,15 @@ public class RsWeapon extends PluginBase {
                 Server.getInstance().getLogger().info("/Armor文件夹创建失败");
             }
         }
-
+        this.getLogger().info("开始加载宝石..");
         loadGemStone();
-
+        this.getLogger().info("宝石加载完成..");
+        this.getLogger().info("开始加载武器..");
+        loadWeapon();
+        this.getLogger().info("武器加载完成..");
+        this.getLogger().info("开始加载盔甲..");
+        loadArmor();
+        this.getLogger().info("盔甲加载完成..");
         this.getServer().getPluginManager().registerEvents(new OnListener(),this);
         this.getServer().getScheduler().scheduleRepeatingTask(new ForeachPlayersTask(),20);
         this.getServer().getScheduler().scheduleRepeatingTask(new FixPlayerInventoryTask(),20);
@@ -124,6 +136,35 @@ public class RsWeapon extends PluginBase {
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
                     GemStones.put(names,GemStone.getInstance(names));
+                    this.getLogger().info(names+" 宝石加载成功");
+                }
+            }
+        }
+    }
+
+    private void loadWeapon(){
+        File file = new File(this.getDataFolder()+"/Weapon");
+        File[] files = file.listFiles();
+        if(files != null){
+            for(File file1:files){
+                if(file1.isFile()){
+                    String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
+                    CaCheWeapon.put(names,Weapon.getInstance(names));
+                    this.getLogger().info(names+" 武器加载成功");
+                }
+            }
+        }
+    }
+
+    private void loadArmor(){
+        File file = new File(this.getDataFolder()+"/Armor");
+        File[] files = file.listFiles();
+        if(files != null){
+            for(File file1:files){
+                if(file1.isFile()){
+                    String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
+                    CaCheArmor.put(names,Armor.getInstance(names));
+                    this.getLogger().info(names+" 盔甲加载成功");
                 }
             }
         }

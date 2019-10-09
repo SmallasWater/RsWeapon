@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /** @author 若水*/
-public abstract class BaseItem {
+public abstract class BaseItem implements Cloneable{
 
     int count;
     final static String TAG_NAME = "RsWeaponName";
@@ -41,13 +41,16 @@ public abstract class BaseItem {
         return new CompoundTag();
     }
 
-    CompoundTag getCompoundTag(CompoundTag tag, String name, int count, LinkedList<GemStone> gemStoneLinkedList){
-        tag.putInt(name+"count",count);
-        ListTag<StringTag> tagListTag = new ListTag<>(name+"Gem");
+    CompoundTag getCompoundTag(CompoundTag tag,boolean unBreak,String name, String tagName, LinkedList<GemStone> gemStoneLinkedList){
+        tag.putString(TAG_NAME,tagName);
+        tag.putString(tagName+"name",name);
+        if(unBreak){
+            tag.putByte("Unbreakable",1);
+        }
+        ListTag<StringTag> tagListTag = new ListTag<>(tagName+"Gem");
         for(GemStone stone:gemStoneLinkedList){
             tagListTag.add(new StringTag(stone.getName(),stone.getName()));
         }
-
         tag.putList(tagListTag);
         return tag;
     }

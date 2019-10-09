@@ -59,8 +59,11 @@ public class Weapon extends BaseItem {
     }
 
 
-    public static Weapon getInstance(String name){
+    public static Weapon getInstance(String name) {
         if(Weapon.inArray(name)){
+            if(RsWeapon.CaCheWeapon.containsKey(name)){
+                RsWeapon.CaCheWeapon.get(name);
+            }
             return toWeapon(name);
         }
         return null;
@@ -178,28 +181,16 @@ public class Weapon extends BaseItem {
     @Override
     public CompoundTag getCompoundTag(){
         CompoundTag tag = item.getNamedTag();
-        tag.putString(BaseItem.TAG_NAME,tagName);
-        tag.putString(tagName+"name",name);
-        tag.putInt(tagName+"level",level);
-        tag.putDouble(tagName+"kick",kick);
-        tag.putInt(tagName+"min",min);
-        tag.putInt(tagName+"max",max);
-        tag.putString(tagName+"type",type);
-        tag.putString(tagName+"message",message);
-        tag.putBoolean(tagName+"unBreak",unBreak);
-        if(this.unBreak){
-            tag.putByte("Unbreakable",1);
-        }
-        tag.putString(tagName+"deathMessage",deathMessage);
-        return super.getCompoundTag(tag,tagName,count,gemStoneLinkedList);
+        return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
     }
 
     @Override
     public Item toItem() {
         Item item = Item.get(this.item.getId(),this.item.getDamage());
-        item = getItemName(item,getCompoundTag(),this.name,tagName);
+        CompoundTag tag = getCompoundTag();
+        reload(tag);
+        item = getItemName(item,tag,this.name,tagName);
         item.setLore(lore());
-        item.addEnchantment(this.item.getEnchantments());
         return item;
     }
 
@@ -209,6 +200,7 @@ public class Weapon extends BaseItem {
             Config config = new Config(RsWeapon.getInstance().getWeaponFile()+"/"+name+".yml",Config.YAML);
             config.set("武器外形",id);
             config.save();
+            RsWeapon.CaCheWeapon.put(name,Weapon.getInstance(name));
         }
     }
 
@@ -240,17 +232,40 @@ public class Weapon extends BaseItem {
     private void init(){
         CompoundTag tag = item.getNamedTag();
         this.name = tag.getString(tagName+"name");
-        this.level = tag.getInt(tagName+"level");
-        this.kick = tag.getDouble(tagName+"kick");
-        this.min = tag.getInt(tagName+"min");
-        this.max = tag.getInt(tagName+"max");
-        this.count = tag.getInt(tagName+"count");
-        this.type = tag.getString(tagName+"type");
-        this.deathMessage = tag.getString(tagName+"deathMessage");
-        this.message = tag.getString(tagName+"message");
-        this.unBreak = tag.contains("Unbreakable");
         ListTag tags = tag.getList(tagName+"Gem");
         gemStoneLinkedList = this.getGemStoneByTag(tags);
+        reload(tag);
+    }
+
+    private void reload(CompoundTag tag){
+        Weapon weapon = Weapon.getInstance(name);
+        if(weapon != null){
+            this.level = weapon.level;
+            this.kick = weapon.kick;
+            this.min = weapon.min;
+            this.max = weapon.max;
+            this.count = weapon.count;
+            this.type = weapon.type;
+            this.deathMessage = weapon.deathMessage;
+            this.message = weapon.message;
+            this.unBreak = weapon.unBreak;
+
+            for (GemStone stone: gemStoneLinkedList) {
+                this.kick += stone.getKick();
+                this.min += stone.getMin();
+                this.max += stone.getMax();
+            }
+            if(tag.contains(tagName+"upData")){
+                for(int level = 1;level <= tag.getInt(tagName+"upData");level++){
+                    int add =  RsWeapon.getInstance().getUpDataAttribute();
+                    if(add > 0){
+                        this.kick += (double) (add / 10);
+                        this.min += add;
+                        this.max += add;
+                    }
+                }
+            }
+        }
     }
 
     public int getCount() {
@@ -305,9 +320,6 @@ public class Weapon extends BaseItem {
 
     public void inlayStone(GemStone stone){
         if(canInlay(stone)){
-            this.kick += stone.getKick();
-            this.min += stone.getMin();
-            this.max += stone.getMax();
             gemStoneLinkedList.add(stone);
         }
     }
@@ -315,9 +327,6 @@ public class Weapon extends BaseItem {
 
     public void removeStone(GemStone stone){
         if(canRemove(stone)){
-            this.kick -= stone.getKick();
-            this.min -= stone.getMin();
-            this.max -= stone.getMax();
             gemStoneLinkedList.remove(stone);
         }
     }
@@ -352,12 +361,6 @@ public class Weapon extends BaseItem {
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }else{
                 EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(),true);
-                int add = RsWeapon.getInstance().getUpDataAttribute();
-                if(add > 0){
-                    this.kick += (double) (add / 10);
-                    this.min += add;
-                    this.max += add;
-                }
                 toUpData(tagName);
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§e恭喜 武器强化成功");
@@ -376,4 +379,5 @@ public class Weapon extends BaseItem {
         }
         return false;
     }
+
 }

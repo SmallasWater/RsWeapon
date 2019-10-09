@@ -40,6 +40,7 @@ public class Armor extends BaseItem{
 
     private boolean unBreak;
 
+
     private LinkedList<GemStone> gemStoneLinkedList = new LinkedList<>();
 
     private Armor(Item item){
@@ -64,6 +65,7 @@ public class Armor extends BaseItem{
     }
 
 
+
     public BlockColor getRgb() {
         return rgb;
     }
@@ -73,19 +75,9 @@ public class Armor extends BaseItem{
     private void init(){
         CompoundTag tag = item.getNamedTag();
         this.name = tag.getString(tagName+"name");
-        this.level = tag.getInt(tagName+"level");
-        this.dKick = tag.getDouble(tagName+"dKick");
-        this.armor = tag.getInt(tagName+"armor");
-        this.health = tag.getInt(tagName+"health");
-        this.toDamage = tag.getInt(tagName+"toDamage");
-        this.count = tag.getInt(tagName+"count");
-        this.type = tag.getString(tagName+"type");
-        this.message = tag.getString(tagName+"message");
-        this.rgb = new BlockColor(tag.getInt(tagName+"rgb"));
-        this.unBreak = tag.contains("Unbreakable");
         ListTag tags = tag.getList(tagName+"Gem");
         gemStoneLinkedList = this.getGemStoneByTag(tags);
-
+        reload(tag);
     }
 
     public static Armor getArmor(Item item){
@@ -136,31 +128,53 @@ public class Armor extends BaseItem{
     @Override
     public CompoundTag getCompoundTag() {
         CompoundTag tag = item.getNamedTag();
-        tag.putString(BaseItem.TAG_NAME,tagName);
-        tag.putString(tagName+"name",name);
-        tag.putInt(tagName+"level",level);
-        tag.putInt(tagName+"armor",armor);
-        tag.putInt(tagName+"health",health);
-        tag.putInt(tagName+"toDamage",toDamage);
-        tag.putInt(tagName+"rgb",rgb.getRGB());
-        tag.putString(tagName+"message",message);
-        if(this.unBreak){
-            tag.putByte("Unbreakable",1);
-        }
-        tag.putString(tagName+"type",type);
-        tag.putDouble(tagName+"dKick",dKick);
-        return super.getCompoundTag(tag,tagName,count,gemStoneLinkedList);
+        return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
     }
 
     @Override
     public Item toItem() {
         Item items = Item.get(this.item.getId(),this.item.getDamage());
-        items = getItemName(items,getCompoundTag(),this.name,tagName);
+        CompoundTag tag = getCompoundTag();
+        reload(tag);
+        items = getItemName(items,tag,this.name,tagName);
         items.setLore(lore());
         items.setCount(1);
-        items.addEnchantment(this.item.getEnchantments());
         return items;
     }
+
+    private void reload(CompoundTag tag){
+        Armor armor = Armor.getInstance(this.name);
+        if(armor != null) {
+            this.level = armor.level;
+            this.dKick = armor.dKick;
+            this.armor = armor.armor;
+            this.health = armor.health;
+            this.toDamage = armor.toDamage;
+            this.count = armor.count;
+            this.type = armor.type;
+            this.message = armor.message;
+            this.rgb = armor.rgb;
+            this.unBreak = armor.unBreak;
+            for (GemStone stone : gemStoneLinkedList) {
+                this.armor += stone.getArmor();
+                this.health += stone.getHealth();
+                this.dKick += stone.getDKick();
+                this.toDamage += stone.getToDamage();
+            }
+            if (tag.contains(tagName + "upData")) {
+                for (int level = 0; level < tag.getInt(tagName + "upData"); level++) {
+                    int add = RsWeapon.getInstance().getUpDataAttribute();
+                    if (add > 0) {
+                        this.armor += add;
+                        this.health += add;
+                        this.dKick += (double) (add / 10);
+                        this.toDamage += add;
+                    }
+                }
+            }
+        }
+    }
+
 
 
     private String[] lore(){
@@ -190,7 +204,7 @@ public class Armor extends BaseItem{
             Config config = new Config(RsWeapon.getInstance().getArmorFile()+"/"+name+".yml",Config.YAML);
             config.set("盔甲外形",id);
             config.save();
-
+            RsWeapon.CaCheArmor.put(name,Armor.getInstance(name));
         }
     }
 
@@ -228,6 +242,9 @@ public class Armor extends BaseItem{
 
     public static Armor getInstance(String name){
         if(Armor.inArray(name)){
+            if(RsWeapon.CaCheArmor.containsKey(name)){
+                return RsWeapon.CaCheArmor.get(name);
+            }
             return toArmor(name);
         }
         return null;
@@ -289,10 +306,6 @@ public class Armor extends BaseItem{
 
     public void inlayStone(GemStone stone){
         if(canInlay(stone)){
-            this.armor += stone.getArmor();
-            this.health += stone.getHealth();
-            this.dKick += stone.getDKick();
-            this.toDamage += stone.getToDamage();
             gemStoneLinkedList.add(stone);
         }
     }
@@ -300,10 +313,6 @@ public class Armor extends BaseItem{
 
     public void removeStone(GemStone stone){
         if(canRemove(stone)){
-            this.armor -= stone.getArmor();
-            this.health -= stone.getHealth();
-            this.dKick -= stone.getDKick();
-            this.toDamage -= stone.getToDamage();
             gemStoneLinkedList.remove(stone);
         }
     }
@@ -350,13 +359,6 @@ public class Armor extends BaseItem{
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }else{
                 EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(),true);
-                int add = RsWeapon.getInstance().getUpDataAttribute();
-                if(add > 0){
-                    this.armor += add;
-                    this.health += add;
-                    this.dKick += (double) (add / 10);
-                    this.toDamage += add;
-                }
                 toUpData(tagName);
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§e恭喜 盔甲强化成功");
