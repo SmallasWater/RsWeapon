@@ -1,7 +1,6 @@
 package weapon.task;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.Task;
 import weapon.players.PlayerEffects;
@@ -27,7 +26,7 @@ public class PlayerAddEffectTask extends Task {
             if(effects.size() > 0){
                 for(BaseEffect effect:effects){
                     if(effect instanceof MineCraftEffect){
-                        if(!playerEffects.containsEffect(effect)){
+                        if(playerEffects.containsEffect(effect)){
                             playerEffects.addEffect(((MineCraftEffect) effect).clone());
                             Effect effect1 = ((MineCraftEffect) effect).getEffect();
                             effect1.setDuration(effect.getTime() * 20);

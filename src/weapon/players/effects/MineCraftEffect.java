@@ -22,8 +22,7 @@ public class MineCraftEffect extends BaseEffect{
     @Override
     public boolean equals(Object effect) {
         if(effect instanceof MineCraftEffect){
-            return (this.effect.getId() == ((MineCraftEffect) effect).effect.getId()
-                    && this.effect.getAmplifier() == ((MineCraftEffect) effect).effect.getAmplifier());
+            return (this.effect.getId() == ((MineCraftEffect) effect).effect.getId());
         }
         return false;
     }

@@ -2,7 +2,6 @@ package weapon;
 
 import AwakenSystem.data.baseAPI;
 import AwakenSystem.data.defaultAPI;
-import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
@@ -51,7 +50,6 @@ public class RsWeapon extends PluginBase {
     public static LinkedHashMap<String , GemStone> GemStones = new LinkedHashMap<>();
 
     public static LinkedHashMap<String, Weapon> CaCheWeapon = new LinkedHashMap<>();
-
 
     public static LinkedHashMap<String, Armor> CaCheArmor = new LinkedHashMap<>();
 

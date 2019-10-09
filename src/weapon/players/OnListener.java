@@ -63,7 +63,7 @@ public class OnListener implements Listener {
                     PlayerEffects playerEffects = PlayerEffects.getInstance(damagePlayer.getName());
                     for (BaseEffect baseEffect:damageEffects){
                         if(baseEffect instanceof PlayerEffect){
-                            if(!playerEffects.containsEffect(baseEffect)){
+                            if(playerEffects.containsEffect(baseEffect)){
                                 if(entity instanceof Player){
                                     PlayerEffects playerEffects2 = RsWeapon.damages.get(entity.getName());
                                     if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.ICE)){
@@ -93,7 +93,7 @@ public class OnListener implements Listener {
                             }
                         }
                         if(baseEffect instanceof MineCraftEffect) {
-                            if (!playerEffects.containsEffect(baseEffect)) {
+                            if (playerEffects.containsEffect(baseEffect)) {
                                 playerEffects.addEffect(((MineCraftEffect) baseEffect).clone());
                                 if (!entity.hasEffect(((MineCraftEffect) baseEffect).getEffect().getId())) {
                                     Effect effect = ((MineCraftEffect) baseEffect).getEffect();
@@ -137,7 +137,7 @@ public class OnListener implements Listener {
                 for (BaseEffect effect:entityEffects){
                     if(effect instanceof PlayerEffect){
                         if(((PlayerEffect) effect).getBufferName().equals(PlayerEffect.SHIELD)){
-                            if(!playerEffects2.containsEffect(effect)){
+                            if(playerEffects2.containsEffect(effect)){
                                 playerEffects2.addEffect(((PlayerEffect) effect).clone());
                                 damage -= damage * effect.getTime() / 100;
                                 ((Player) entity).sendTip("...防护盾效果触发...");

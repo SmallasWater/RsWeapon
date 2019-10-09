@@ -110,13 +110,13 @@ public abstract class BaseItem implements Cloneable{
                         .append(type)
                         .append("§r")
                         .append(((PlayerEffect) effect).getBufferName()).append("\n");
-                if("防护盾".equals(((PlayerEffect) effect).getBufferName())){
+                if(PlayerEffect.SHIELD.equals(((PlayerEffect) effect).getBufferName())){
                     builder.append("§7抵抗伤害: ");
                     builder.append(effect.getTime()).append(" % ");
-                }else if("吸血".equals(((PlayerEffect) effect).getBufferName())) {
+                }else if(PlayerEffect.ADD_HEALTH.equals(((PlayerEffect) effect).getBufferName())) {
                     builder.append("§7吸收伤害: ");
                     builder.append(effect.getTime()).append(" % ");
-                }else if("雷击".equals(((PlayerEffect) effect).getBufferName())){
+                }else if(PlayerEffect.LIGHTNING.equals(((PlayerEffect) effect).getBufferName())){
                     builder.append("§7伤害: ");
                     builder.append(effect.getTime());
                 }else{
@@ -169,7 +169,7 @@ public abstract class BaseItem implements Cloneable{
             builder.append(skillGetString(effects,"§b[被动]"));
         }
         if(damages.size() > 0){
-            builder.append(skillGetString(damages,"§7[主动]"));
+            builder.append(skillGetString(damages,"§9[主动]"));
         }
         return builder.toString();
     }
@@ -187,7 +187,7 @@ public abstract class BaseItem implements Cloneable{
                 i++;
             }
         }else{
-            builder.append("§c    无");
+            builder.append("§c  无");
         }
         return builder;
     }

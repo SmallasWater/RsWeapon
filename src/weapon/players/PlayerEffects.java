@@ -30,7 +30,7 @@ public class PlayerEffects {
     }
 
     public void addEffect(BaseEffect effect){
-        if(!containsEffect(effect)){
+        if(containsEffect(effect)){
             effects.add(effect);
         }
     }
@@ -41,21 +41,24 @@ public class PlayerEffects {
     }
 
 
+    /**
+     * 判断是否不存在药水
+     * */
     public boolean containsEffect(BaseEffect effect){
         if(effect != null){
             if(effects != null){
                 try {
                     for(BaseEffect baseEffect:effects){
                         if(baseEffect.equals(effect)){
-                            return true;
+                            return false;
                         }
                     }
                 }catch (Exception e){
-                    return false;
+                    return true;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     BaseEffect containsEffect(){
