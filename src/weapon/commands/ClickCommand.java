@@ -1,10 +1,13 @@
 package weapon.commands;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemColorArmor;
+import weapon.events.PlayerClickGemStoneEvent;
+import weapon.events.PlayerRemoveGemStoneEvent;
 import weapon.items.Armor;
 import weapon.items.BaseItem;
 import weapon.items.GemStone;
@@ -118,6 +121,8 @@ public class ClickCommand extends Command {
                             ((Weapon) item).inlayStone(stone);
                             sender.getInventory().setItemInHand(item.toItem());
                             toRemoveStone(stone,sender);
+                            PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender,stone,item);
+                            Server.getInstance().getPluginManager().callEvent(events);
                             sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                             sender.sendMessage("§r§e[镶嵌系统]§e恭喜   宝石镶嵌成功  ");
                             sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -135,6 +140,8 @@ public class ClickCommand extends Command {
                             }
                             sender.getInventory().setItemInHand(armor);
                             toRemoveStone(stone,sender);
+                            PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender,stone,item);
+                            Server.getInstance().getPluginManager().callEvent(events);
                             sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                             sender.sendMessage("§r§e[镶嵌系统]§e恭喜   宝石镶嵌成功  ");
                             sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -171,6 +178,8 @@ public class ClickCommand extends Command {
                     ((Weapon) item).removeStone(stone);
                     sender.getInventory().setItemInHand(item.toItem());
                     sender.getInventory().addItem(stone.toItem());
+                    PlayerRemoveGemStoneEvent events = new PlayerRemoveGemStoneEvent(sender,stone,item);
+                    Server.getInstance().getPluginManager().callEvent(events);
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                     sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除成功");
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -188,6 +197,8 @@ public class ClickCommand extends Command {
                     }
                     sender.getInventory().setItemInHand(armor);
                     sender.getInventory().addItem(stone.toItem());
+                    PlayerRemoveGemStoneEvent events = new PlayerRemoveGemStoneEvent(sender,stone,item);
+                    Server.getInstance().getPluginManager().callEvent(events);
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                     sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除成功");
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");

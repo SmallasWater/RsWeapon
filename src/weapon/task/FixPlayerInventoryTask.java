@@ -27,6 +27,7 @@ public class FixPlayerInventoryTask extends Task {
                         Weapon weapon = Weapon.getWeapon(item);
                         toAddStone(weapon,player);
                         player.getInventory().remove(item);
+
                     }
                 }
                 if(Armor.isArmor(item)){

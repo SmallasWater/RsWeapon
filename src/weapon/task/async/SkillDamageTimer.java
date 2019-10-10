@@ -25,7 +25,7 @@ public class SkillDamageTimer extends AsyncTask {
                     if (effect instanceof PlayerEffect) {
                         if (((PlayerEffect) effect).getBufferName().equals(PlayerEffect.ICE)) {
                             if (effect.getTime() > 0) {
-                                effect.setCold(effect.getCold() - 1);
+                                effect.setTime(effect.getTime() - 1);
                             } else {
                                 effects.removeEffect(effect);
                             }

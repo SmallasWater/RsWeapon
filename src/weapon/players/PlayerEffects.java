@@ -29,6 +29,13 @@ public class PlayerEffects {
         return RsWeapon.effects.get(player);
     }
 
+    public static PlayerEffects getDamageEffect(String player){
+        if(!RsWeapon.damages.containsKey(player)){
+            RsWeapon.damages.put(player,new PlayerEffects(player));
+        }
+        return RsWeapon.damages.get(player);
+    }
+
     public void addEffect(BaseEffect effect){
         if(containsEffect(effect)){
             effects.add(effect);

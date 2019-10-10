@@ -65,7 +65,7 @@ public class OnListener implements Listener {
                         if(baseEffect instanceof PlayerEffect){
                             if(playerEffects.containsEffect(baseEffect)){
                                 if(entity instanceof Player){
-                                    PlayerEffects playerEffects2 = RsWeapon.damages.get(entity.getName());
+                                    PlayerEffects playerEffects2 = PlayerEffects.getDamageEffect(entity.getName());
                                     if(((PlayerEffect) baseEffect).getBufferName().equals(PlayerEffect.ICE)){
                                         playerEffects2.addEffect(((PlayerEffect) baseEffect).clone());
                                         playerEffects.addEffect(((PlayerEffect) baseEffect).clone());

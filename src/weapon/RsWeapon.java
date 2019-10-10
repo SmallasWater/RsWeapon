@@ -80,6 +80,8 @@ public class RsWeapon extends PluginBase {
                 Server.getInstance().getLogger().info("/Armor文件夹创建失败");
             }
         }
+        this.getLogger().info("开始加载配置文件");
+        long t1 = System.currentTimeMillis();
         this.getLogger().info("开始加载宝石..");
         loadGemStone();
         this.getLogger().info("宝石加载完成..");
@@ -95,6 +97,8 @@ public class RsWeapon extends PluginBase {
         this.getServer().getCommandMap().register("",new ClickCommand("click"));
         this.getServer().getCommandMap().register("",new WeCommand("we"));
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
+        long t2 = System.currentTimeMillis();
+        this.getLogger().info("配置加载完成 用时:"+((t2 - t1) % (1000 * 60))+"ms");
         this.getLogger().info("武器系统加载成功..作者: 若水");
     }
 
