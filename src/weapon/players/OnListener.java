@@ -206,8 +206,8 @@ public class OnListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event){
         Player player = event.getPlayer();
-        if(RsWeapon.effects.containsKey(player.getName())){
-            PlayerEffects effects = PlayerEffects.getInstance(player.getName());
+        if(RsWeapon.damages.containsKey(player.getName())){
+            PlayerEffects effects = PlayerEffects.getDamageEffect(player.getName());
             BaseEffect effect = effects.containsEffect();
             if(effect != null){
                 event.setCancelled();

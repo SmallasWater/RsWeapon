@@ -270,7 +270,11 @@ public abstract class BaseItem implements Cloneable{
             }
             int playerPF = defaultAPI.getPlayerAttributeInt(player.getName(), baseAPI.PlayerConfigType.TALENT);
             if(playerLevel >= rpgLevel){
-                if(playerAttribute.equals(rpgAttribute)){
+                if(!"".equals(rpgAttribute)){
+                    if(playerAttribute.equals(rpgAttribute)){
+                        return playerPF >= rpgPF;
+                    }
+                }else{
                     return playerPF >= rpgPF;
                 }
             }

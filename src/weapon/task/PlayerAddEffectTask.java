@@ -32,6 +32,9 @@ public class PlayerAddEffectTask extends Task {
                             effect1.setDuration(effect.getTime() * 20);
                             if(!player.hasEffect(effect1.getId())){
                                 player.addEffect(effect1);
+                            }else{
+                                player.removeEffect(effect1.getId());
+                                player.addEffect(effect1);
                             }
                         }
                     }

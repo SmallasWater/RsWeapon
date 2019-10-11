@@ -184,7 +184,8 @@ public class Armor extends BaseItem{
                     if (add > 0) {
                         this.armor += add;
                         this.health += add;
-                        this.dKick += (double) (add / 10);
+                        this.dKick += Double.parseDouble(
+                                new java.text.DecimalFormat("#.00").format(((float) add / 10)));
                         this.toDamage += add;
                     }
                 }

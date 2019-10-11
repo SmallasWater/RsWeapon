@@ -287,7 +287,8 @@ public class Weapon extends BaseItem {
                 for(int level = 1;level <= tag.getInt(tagName+"upData");level++){
                     int add =  RsWeapon.getInstance().getUpDataAttribute();
                     if(add > 0){
-                        this.kick += (double) (add / 10);
+                        this.kick += Double.parseDouble(
+                                new java.text.DecimalFormat("#.00").format(((float) add / 10)));
                         this.min += add;
                         this.max += add;
                     }
