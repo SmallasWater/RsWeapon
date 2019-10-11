@@ -226,7 +226,7 @@ public class GemStone extends BaseItem{
 
     }
 
-    private static String getItemName(Item item){
+    static String getItemName(Item item){
         CompoundTag tag = item.getNamedTag();
         return tag.getString(TAG_NAME+"name");
     }

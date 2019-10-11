@@ -237,7 +237,7 @@ public class Weapon extends BaseItem {
         lore.add("§r§6◈类型   §6◈§a武器");
         lore.add("§r§6◈耐久   §6◈"+(unBreak?"§7无限耐久":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
         lore.add("§r§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
-        lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim()));
+        lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim())) ;
         lore.add("§r§6◈§7攻击§6◈ §a"+min+" - "+max);
         lore.add("§r§6◈§7击退§6◈ §a"+kick);
         lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
@@ -276,10 +276,12 @@ public class Weapon extends BaseItem {
             this.rpgAttribute = weapon.rpgAttribute;
             this.rpgLevel = weapon.rpgLevel;
             this.rpgPF = weapon.rpgPF;
-            for (GemStone stone: gemStoneLinkedList) {
-                this.kick += stone.getKick();
-                this.min += stone.getMin();
-                this.max += stone.getMax();
+            if(gemStoneLinkedList.size() > 0){
+                for (GemStone stone: gemStoneLinkedList) {
+                    this.kick += stone.getKick();
+                    this.min += stone.getMin();
+                    this.max += stone.getMax();
+                }
             }
             if(tag.contains(tagName+"upData")){
                 for(int level = 1;level <= tag.getInt(tagName+"upData");level++){

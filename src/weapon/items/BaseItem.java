@@ -147,6 +147,17 @@ public abstract class BaseItem implements Cloneable{
 
     }
 
+    static String getItemName(Item item){
+        if(item.hasCompoundTag()){
+            CompoundTag tag = item.getNamedTag();
+            if(tag.contains(BaseItem.TAG_NAME)){
+                return tag.getString(BaseItem.TAG_NAME);
+
+            }
+        }
+        return null;
+    }
+
     String skillToString(LinkedList<GemStone> gemStoneLinkedList,boolean isWeapon){
         StringBuilder builder = new StringBuilder();
         LinkedList<BaseEffect> effects = new LinkedList<>();
@@ -254,8 +265,16 @@ public abstract class BaseItem implements Cloneable{
         if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
             int playerLevel = defaultAPI.getPlayerAttributeInt(player.getName(), baseAPI.PlayerConfigType.LEVEL);
             String playerAttribute = defaultAPI.getPlayerAttributeString(player.getName(), baseAPI.PlayerConfigType.ATTRIBUTE);
+            if(playerAttribute == null || "null".equals(playerAttribute)){
+                playerAttribute = "";
+            }
             int playerPF = defaultAPI.getPlayerAttributeInt(player.getName(), baseAPI.PlayerConfigType.TALENT);
-            return playerLevel >= rpgLevel && playerAttribute.equals(rpgAttribute) && playerPF >= rpgPF;
+            if(playerLevel >= rpgLevel){
+                if(playerAttribute.equals(rpgAttribute)){
+                    return playerPF >= rpgPF;
+                }
+            }
+            return false;
         }
         return true;
     }

@@ -6,6 +6,7 @@ import cn.nukkit.Server;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import weapon.commands.ClickCommand;
+import weapon.commands.ReloadCommand;
 import weapon.commands.UpDataCommand;
 import weapon.commands.WeCommand;
 import weapon.items.Armor;
@@ -96,6 +97,7 @@ public class RsWeapon extends PluginBase {
         this.getServer().getScheduler().scheduleRepeatingTask(new FixPlayerInventoryTask(),20);
         this.getServer().getCommandMap().register("",new ClickCommand("click"));
         this.getServer().getCommandMap().register("",new WeCommand("we"));
+        this.getServer().getCommandMap().register("",new ReloadCommand("up"));
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
         long t2 = System.currentTimeMillis();
         this.getLogger().info("配置加载完成 用时:"+((t2 - t1) % (1000 * 60))+"ms");

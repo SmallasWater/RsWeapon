@@ -90,6 +90,7 @@ public class ClickCommand extends Command {
                             remove.setCount(1);
                         }
                         player.getInventory().removeItem(remove);
+                        return;
                     }
                 }
             }
