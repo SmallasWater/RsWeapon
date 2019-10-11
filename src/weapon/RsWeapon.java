@@ -118,7 +118,7 @@ public class RsWeapon extends PluginBase {
         return new File(this.getDataFolder()+"/Armor");
     }
 
-    private LinkedList<ItemLevel> initLevel(){
+    public LinkedList<ItemLevel> initLevel(){
         LinkedList<ItemLevel> levels = new LinkedList<>();
         Config config = this.getConfig();
         List<String> map =  config.getStringList("武器等级");
@@ -130,7 +130,7 @@ public class RsWeapon extends PluginBase {
     }
 
 
-    private void loadGemStone(){
+    public void loadGemStone(){
         File file = new File(this.getDataFolder()+"/GemStone");
         File[] files = file.listFiles();
         if(files != null){
@@ -144,7 +144,7 @@ public class RsWeapon extends PluginBase {
         }
     }
 
-    private void loadWeapon(){
+    public void loadWeapon(){
         File file = new File(this.getDataFolder()+"/Weapon");
         File[] files = file.listFiles();
         if(files != null){
@@ -158,7 +158,7 @@ public class RsWeapon extends PluginBase {
         }
     }
 
-    private void loadArmor(){
+    public void loadArmor(){
         File file = new File(this.getDataFolder()+"/Armor");
         File[] files = file.listFiles();
         if(files != null){

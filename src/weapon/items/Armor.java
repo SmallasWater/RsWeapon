@@ -1,7 +1,10 @@
 package weapon.items;
 
 
+import AwakenSystem.data.baseAPI;
+import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -27,8 +30,19 @@ public class Armor extends BaseItem{
     private int armor;
 
     private BlockColor rgb;
+    /**
+     * 限制等级(rpg): 0
+     * 限制职业(属性): ""
+     * 限制评级: 0
+     * */
 
     private String message;
+
+    private int rpgLevel;
+
+    private String rpgAttribute;
+
+    private int rpgPF;
 
     private double dKick;
 
@@ -155,6 +169,9 @@ public class Armor extends BaseItem{
             this.message = armor.message;
             this.rgb = armor.rgb;
             this.unBreak = armor.unBreak;
+            this.rpgPF = armor.rpgPF;
+            this.rpgLevel = armor.rpgLevel;
+            this.rpgAttribute = armor.rpgAttribute;
             for (GemStone stone : gemStoneLinkedList) {
                 this.armor += stone.getArmor();
                 this.health += stone.getHealth();
@@ -183,9 +200,7 @@ public class Armor extends BaseItem{
         lore.add("§r§6◈类型   ◈§e盔甲");
         lore.add("§r§6◈耐久   ◈"+(unBreak?"§7无限耐久":"§c会损坏"));
         lore.add("§r§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§f═§7╞════════════╡§f═");
-        lore.add("§r"+message.trim());
-        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim()));
         lore.add("§r§6◈§7护甲§6◈    §7+"+armor);
         lore.add("§r§6◈§7韧性§6◈    §7+"+dKick);
         lore.add("§r§6◈§7血量§6◈    §7+"+health);
@@ -284,12 +299,30 @@ public class Armor extends BaseItem{
         int count = config.getInt("镶嵌数量");
         String message = config.getString("介绍");
         boolean un = config.getBoolean("无限耐久");
+        int rpgLevel = config.getInt("限制等级(rpg)",0);
+        int rpgPF = config.getInt("限制评级",0);
+        String rpgAttribute = config.getString("限制职业(属性)","");
         Armor armor1 = new Armor(item,armor,dKick,health,toDamage,level,count,un);
+        armor1.setRpgLevel(rpgLevel);
+        armor1.setRpgPF(rpgPF);
+        armor1.setRpgAttribute(rpgAttribute);
         armor1.setRGB(r,g,b);
         armor1.setMessage(message);
         armor1.setType(type);
         armor1.setName(name);
         return armor1;
+    }
+
+    public void setRpgAttribute(String rpgAttribute) {
+        this.rpgAttribute = rpgAttribute;
+    }
+
+    public void setRpgLevel(int rpgLevel) {
+        this.rpgLevel = rpgLevel;
+    }
+
+    public void setRpgPF(int rpgPF) {
+        this.rpgPF = rpgPF;
     }
 
     public void setName(String name) {
@@ -371,5 +404,10 @@ public class Armor extends BaseItem{
 
     private void setType(String type) {
         this.type = type;
+    }
+
+
+    public boolean canUseArmor(Player player){
+        return canUse(player,rpgLevel,rpgAttribute,rpgPF);
     }
 }

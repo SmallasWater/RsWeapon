@@ -11,6 +11,7 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerDeathEvent;
+import cn.nukkit.event.player.PlayerItemHeldEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.item.Item;
@@ -24,6 +25,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.TextFormat;
 import weapon.RsWeapon;
+import weapon.items.Armor;
 import weapon.items.BaseItem;
 import weapon.items.Weapon;
 import weapon.players.effects.BaseEffect;
@@ -175,6 +177,27 @@ public class OnListener implements Listener {
                                 .replace("{player}",death.getName()));
                     }
                 }
+            }
+        }
+    }
+
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemInHand(PlayerItemHeldEvent event){
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+        if(Weapon.isWeapon(item)){
+            Weapon weapon = Weapon.getWeapon(item);
+            if(weapon != null){
+                if(!weapon.canUseWeapon(player)){
+                    player.sendMessage("§c此武器无法使用...");
+                }
+            }
+        }
+        if(Armor.isArmor(item)){
+            Armor armor = Armor.getArmor(item);
+            if(!armor.canUseArmor(player)){
+                player.sendMessage("§c此盔甲无法使用...");
             }
         }
     }

@@ -7,6 +7,7 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemColorArmor;
 import cn.nukkit.utils.TextFormat;
+import weapon.RsWeapon;
 import weapon.items.Armor;
 import weapon.items.GemStone;
 import weapon.items.Weapon;
@@ -37,6 +38,7 @@ public class WeCommand extends Command {
                         commandSender.sendMessage("§b/we give armor <盔甲名称> <Player> §a给玩家盔甲");
                         commandSender.sendMessage("§b/we addItem <宝石名称> <ID:Damage> §a添加宝石");
                         commandSender.sendMessage("§b/we giveItem <宝石名称> <Player> §a给玩家宝石");
+                        commandSender.sendMessage("§b/we reload§a重新加载");
                         commandSender.sendMessage("§7=================================");
                         break;
                     case "add":
@@ -104,6 +106,14 @@ public class WeCommand extends Command {
                                 default:return false;
                         }
 
+                        break;
+                    case "reload":
+                        commandSender.sendMessage(TextFormat.GOLD+"重新加载武器盔甲中...");
+                        RsWeapon.getInstance().loadArmor();
+                        RsWeapon.getInstance().loadWeapon();
+                        RsWeapon.getInstance().loadGemStone();
+                        RsWeapon.levels = RsWeapon.getInstance().initLevel();
+                        commandSender.sendMessage(TextFormat.GOLD+"重新加载完成");
                         break;
                     case "addItem":
                         if(GemStone.inArray(args.get(1))){

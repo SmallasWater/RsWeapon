@@ -87,9 +87,9 @@ public class ClickCommand extends Command {
                     if(stone1.equals(stone)){
                         Item remove = item.clone();
                         if(item.getCount() > 1){
-                            remove.setCount(remove.getCount() - 1);
+                            remove.setCount(1);
                         }
-                        player.getInventory().remove(remove);
+                        player.getInventory().removeItem(remove);
                     }
                 }
             }

@@ -1,6 +1,9 @@
 package weapon.items;
 
+import AwakenSystem.data.baseAPI;
+import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -23,6 +26,12 @@ public class Weapon extends BaseItem {
     private int min;
 
     private int max;
+
+    private int rpgLevel;
+
+    private String rpgAttribute;
+
+    private int rpgPF;
 
     private String type;
 
@@ -148,16 +157,33 @@ public class Weapon extends BaseItem {
         int count = config.getInt("镶嵌数量");
 
         boolean un = config.getBoolean("无限耐久");
+        int rpgLevel = config.getInt("限制等级(rpg)",0);
+        int rpgPF = config.getInt("限制评级",0);
+        String rpgAttribute = config.getString("限制职业(属性)","");
 
         String deathMessage = config.getString("击杀提示");
         Weapon weapon = new Weapon(item,min,max,kick,level,count,un,deathMessage);
+        weapon.setRpgAttribute(rpgAttribute);
+        weapon.setRpgPF(rpgPF);
+        weapon.setRpgLevel(rpgLevel);
         weapon.setMessage(config.getString("介绍"));
         weapon.setType(type);
         weapon.setName(name);
         return weapon;
     }
 
+    public void setRpgPF(int rpgPF) {
+        this.rpgPF = rpgPF;
+    }
 
+    public void setRpgLevel(int rpgLevel) {
+        this.rpgLevel = rpgLevel;
+    }
+
+
+    public void setRpgAttribute(String rpgAttribute) {
+        this.rpgAttribute = rpgAttribute;
+    }
 
     private void setName(String name) {
         this.name = name;
@@ -211,9 +237,7 @@ public class Weapon extends BaseItem {
         lore.add("§r§6◈类型   §6◈§a武器");
         lore.add("§r§6◈耐久   §6◈"+(unBreak?"§7无限耐久":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
         lore.add("§r§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§f═§7╞════════════╡§f═");
-        lore.add("§r"+message.trim());
-        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim()));
         lore.add("§r§6◈§7攻击§6◈ §a"+min+" - "+max);
         lore.add("§r§6◈§7击退§6◈ §a"+kick);
         lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
@@ -249,7 +273,9 @@ public class Weapon extends BaseItem {
             this.deathMessage = weapon.deathMessage;
             this.message = weapon.message;
             this.unBreak = weapon.unBreak;
-
+            this.rpgAttribute = weapon.rpgAttribute;
+            this.rpgLevel = weapon.rpgLevel;
+            this.rpgPF = weapon.rpgPF;
             for (GemStone stone: gemStoneLinkedList) {
                 this.kick += stone.getKick();
                 this.min += stone.getMin();
@@ -369,6 +395,10 @@ public class Weapon extends BaseItem {
             }
         }
         return false;
+    }
+
+    public boolean canUseWeapon(Player player){
+        return canUse(player,rpgLevel,rpgAttribute,rpgPF);
     }
 
     @Override

@@ -1,5 +1,10 @@
 package weapon.items;
 
+import AwakenSystem.AwakenSystem;
+import AwakenSystem.data.baseAPI;
+import AwakenSystem.data.defaultAPI;
+import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -9,9 +14,7 @@ import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
 import weapon.players.effects.PlayerEffect;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /** @author 若水*/
 public abstract class BaseItem implements Cloneable{
@@ -224,6 +227,50 @@ public abstract class BaseItem implements Cloneable{
         item.setCompoundTag(tag);
     }
 
+    private ArrayList<String> getRPGList(int rpgLevel,String rpgAttribute,int rpgPF){
+        ArrayList<String> lore = new ArrayList<>();
+        if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
+            lore.add("§r§f═§7╞════════════╡§f═");
+            lore.add("§r§e◎§b限制等级§e◎  §f"+rpgLevel);
+            lore.add("§r§e◎§b限制评级§e◎  §f"+getChatMessageAll().get(rpgPF));
+            lore.add("§r§e◎§b限制属性§e◎  §f"+("".equals(rpgAttribute)?"无":rpgAttribute));
+        }
+        return lore;
+    }
+
+    ArrayList<String> getListByRPG(int rpgLevel,String rpgAttribute,int rpgPF,String message){
+        ArrayList<String> lore = new ArrayList<>();
+        ArrayList<String> listTag = getRPGList(rpgLevel,rpgAttribute,rpgPF);
+        if(listTag.size() > 0){
+            lore.addAll(listTag);
+        }
+        lore.add("§r§f═§7╞════════════╡§f═");
+        lore.add("§r"+message.trim());
+        lore.add("§r§f═§7╞════════════╡§f═");
+        return lore;
+    }
+
+    boolean canUse(Player player, int rpgLevel, String rpgAttribute, int rpgPF){
+        if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
+            int playerLevel = defaultAPI.getPlayerAttributeInt(player.getName(), baseAPI.PlayerConfigType.LEVEL);
+            String playerAttribute = defaultAPI.getPlayerAttributeString(player.getName(), baseAPI.PlayerConfigType.ATTRIBUTE);
+            int playerPF = defaultAPI.getPlayerAttributeInt(player.getName(), baseAPI.PlayerConfigType.TALENT);
+            return playerLevel >= rpgLevel && playerAttribute.equals(rpgAttribute) && playerPF >= rpgPF;
+        }
+        return true;
+    }
+
+
+    private static LinkedHashMap<Integer, String> getChatMessageAll() {
+        HashMap map = (HashMap) AwakenSystem.getMain().getConfig().get(baseAPI.ConfigType.SETTING.getName());
+        int count = 0;
+        LinkedHashMap<Integer, String> m = new LinkedHashMap<>();
+        for(Iterator var3 = map.keySet().iterator(); var3.hasNext(); ++count) {
+            Object string = var3.next();
+            m.put(count, String.valueOf(string));
+        }
+        return m;
+    }
 
 
 }

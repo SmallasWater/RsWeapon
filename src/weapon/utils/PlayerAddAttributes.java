@@ -13,15 +13,23 @@ import java.util.Random;
 
 public class PlayerAddAttributes {
 
-    public static LinkedList<BaseItem> getItems(Player player){
+    private static LinkedList<BaseItem> getItems(Player player){
         LinkedList<BaseItem> items = new LinkedList<>();
         Item item = player.getInventory().getItemInHand();
         if(Weapon.isWeapon(item)){
-            items.add(Weapon.getWeapon(item));
+            Weapon weapon = Weapon.getWeapon(item);
+            if(weapon != null){
+                if(weapon.canUseWeapon(player)){
+                    items.add(weapon);
+                }
+            }
         }
-        for (Item armor:player.getInventory().getArmorContents()){
-            if(Armor.isArmor(armor)){
-                items.add(Armor.getArmor(armor));
+        for (Item armorItem:player.getInventory().getArmorContents()){
+            if(Armor.isArmor(armorItem)){
+                Armor armor = Armor.getArmor(armorItem);
+                if(armor.canUseArmor(player)){
+                    items.add(armor);
+                }
             }
         }
         return items;
