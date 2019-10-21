@@ -44,11 +44,11 @@ public class ClickCommand extends Command {
                     }
                     Item itemHand = ((Player) commandSender).getInventory().getItemInHand();
                     if(Weapon.isWeapon(itemHand)){
-                        Weapon weapon = Weapon.getWeapon(itemHand);
+                        Weapon weapon = Weapon.getInstance(itemHand);
                         inviteStone((Player) commandSender,args.get(1),weapon);
 
                     }else if(Armor.isArmor(itemHand)){
-                        Armor armor = Armor.getArmor(itemHand);
+                        Armor armor = Armor.getInstance(itemHand);
                         inviteStone((Player) commandSender,args.get(1),armor);
                     }
                     break;
@@ -59,11 +59,11 @@ public class ClickCommand extends Command {
                     }
                     Item itemHand1 = ((Player) commandSender).getInventory().getItemInHand();
                     if(Weapon.isWeapon(itemHand1)){
-                        Weapon weapon = Weapon.getWeapon(itemHand1);
+                        Weapon weapon = Weapon.getInstance(itemHand1);
                         removeStone((Player) commandSender,args.get(1),weapon);
 
                     }else if(Armor.isArmor(itemHand1)){
-                        Armor armor = Armor.getArmor(itemHand1);
+                        Armor armor = Armor.getInstance(itemHand1);
                         removeStone((Player) commandSender,args.get(1),armor);
                     }else{
                         commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");

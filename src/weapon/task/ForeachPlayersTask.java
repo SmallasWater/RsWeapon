@@ -27,9 +27,6 @@ public class ForeachPlayersTask extends Task {
                             new SkillDamageTimer(effects));
                 }
             }
-            if(player.isOnline()){
-                Server.getInstance().getScheduler().scheduleDelayedTask(new PlayerAddEffectTask(player),2);
-            }
         }
     }
 }

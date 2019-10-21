@@ -17,7 +17,7 @@ public class PlayerAddAttributes {
         LinkedList<BaseItem> items = new LinkedList<>();
         Item item = player.getInventory().getItemInHand();
         if(Weapon.isWeapon(item)){
-            Weapon weapon = Weapon.getWeapon(item);
+            Weapon weapon = Weapon.getInstance(item);
             if(weapon != null){
                 if(weapon.canUseWeapon(player)){
                     items.add(weapon);
@@ -26,7 +26,7 @@ public class PlayerAddAttributes {
         }
         for (Item armorItem:player.getInventory().getArmorContents()){
             if(Armor.isArmor(armorItem)){
-                Armor armor = Armor.getArmor(armorItem);
+                Armor armor = Armor.getInstance(armorItem);
                 if(armor.canUseArmor(player)){
                     items.add(armor);
                 }
@@ -120,10 +120,18 @@ public class PlayerAddAttributes {
         if(items.size() > 0){
             for (BaseItem item:items){
                 if(item instanceof Armor){
-                    effects.addAll(((Armor) item).getEffects());
+                    for(BaseEffect effect:((Armor) item).getEffects()){
+                        if(!effects.contains(effect)){
+                            effects.add(effect);
+                        }
+                    }
                 }
                 if(item instanceof Weapon){
-                    effects.addAll(((Weapon) item).getEffects());
+                    for(BaseEffect effect:((Weapon) item).getEffects()){
+                        if(!effects.contains(effect)){
+                            effects.add(effect);
+                        }
+                    }
                 }
             }
         }
@@ -137,7 +145,11 @@ public class PlayerAddAttributes {
         if(items.size() > 0){
             for (BaseItem item:items){
                 if(item instanceof Weapon){
-                    effects.addAll(((Weapon) item).getDamages());
+                    for (BaseEffect effect:((Weapon) item).getDamages()){
+                        if(!effects.contains(effect)){
+                            effects.add(effect);
+                        }
+                    }
                 }
             }
         }

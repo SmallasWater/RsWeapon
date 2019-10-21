@@ -5,6 +5,9 @@ import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
+
+import updata.AutoData;
+import updata.utils.UpData;
 import weapon.commands.ClickCommand;
 import weapon.commands.ReloadCommand;
 import weapon.commands.UpDataCommand;
@@ -56,9 +59,27 @@ public class RsWeapon extends PluginBase {
 
 
 
+
     @Override
     public void onEnable() {
         instance = this;
+        if(Server.getInstance().getPluginManager().getPlugin("AutoUpData") != null){
+            UpData data = AutoData.get(this,getFile(),"SmallasWater","RsWeapon");
+            if(data == null){
+                this.getLogger().info("更新检查失败");
+            }else{
+                if(data.canUpdate()){
+                    this.getLogger().info("有可用新版本 v"+data.getNewVersion());
+                    this.getLogger().info("更新内容 "+data.getNewVersionMessage());
+                    if(!data.toUpData()){
+                        this.getLogger().info("更新失败");
+                    }else{
+                        this.getLogger().info("更新完成");
+
+                    }
+                }
+            }
+        }
         File gemFiles = getGemFile();
         File weaponFile = getWeaponFile();
         File armorFile = getArmorFile();
@@ -190,8 +211,11 @@ public class RsWeapon extends PluginBase {
     public void onDisable() {
         for (String playerName: addHealth.keySet()) {
             if (Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null) {
-                defaultAPI.removePlayerAttributeInt(playerName, baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(playerName));
-                RsWeapon.addHealth.remove(playerName);
+                if(addHealth.containsKey(playerName)){
+                    defaultAPI.removePlayerAttributeInt(playerName, baseAPI.PlayerAttType.HEALTH,addHealth.get(playerName));
+                    RsWeapon.addHealth.remove(playerName);
+                }
+
             }
         }
     }

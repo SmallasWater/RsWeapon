@@ -21,7 +21,7 @@ public class UpDataCommand extends Command {
         if(commandSender instanceof Player){
             Item item = ((Player) commandSender).getInventory().getItemInHand();
             if(Weapon.isWeapon(item)){
-                Weapon weapon = Weapon.getWeapon(item);
+                Weapon weapon = Weapon.getInstance(item);
                 if(weapon != null){
                     if(weapon.upData((Player) commandSender)){
                         ((Player) commandSender).getInventory().removeItem(item);
@@ -29,7 +29,7 @@ public class UpDataCommand extends Command {
                     }
                 }
             }else if(Armor.isArmor(item)){
-                Armor armor = Armor.getArmor(item);
+                Armor armor = Armor.getInstance(item);
                 if(armor.upData((Player) commandSender)){
                     ((Player) commandSender).getInventory().removeItem(item);
                     ((Player) commandSender).getInventory().addItem(armor.toItem());

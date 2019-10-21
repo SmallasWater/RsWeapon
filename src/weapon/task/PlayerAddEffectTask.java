@@ -15,7 +15,7 @@ public class PlayerAddEffectTask extends Task {
     private Player player;
 
 
-    PlayerAddEffectTask(Player player){
+    public PlayerAddEffectTask(Player player){
         this.player = player;
     }
     @Override
@@ -30,16 +30,13 @@ public class PlayerAddEffectTask extends Task {
                             playerEffects.addEffect(((MineCraftEffect) effect).clone());
                             Effect effect1 = ((MineCraftEffect) effect).getEffect();
                             effect1.setDuration(effect.getTime() * 20);
-                            if(!player.hasEffect(effect1.getId())){
-                                player.addEffect(effect1);
-                            }else{
-                                player.removeEffect(effect1.getId());
-                                player.addEffect(effect1);
-                            }
+                            player.addEffect(effect1);
                         }
                     }
                 }
             }
+        }else{
+            this.cancel();
         }
     }
 }

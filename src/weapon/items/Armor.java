@@ -1,10 +1,7 @@
 package weapon.items;
 
 
-import AwakenSystem.data.baseAPI;
-import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -74,7 +71,7 @@ public class Armor extends BaseItem{
         this.toDamage = toDamage;
     }
 
-    private String getType() {
+    public String getType() {
         return type;
     }
 
@@ -94,7 +91,7 @@ public class Armor extends BaseItem{
         reload(tag);
     }
 
-    public static Armor getArmor(Item item){
+    public static Armor getInstance(Item item){
         return new Armor(item);
     }
 
@@ -184,8 +181,7 @@ public class Armor extends BaseItem{
                     if (add > 0) {
                         this.armor += add;
                         this.health += add;
-                        this.dKick += Double.parseDouble(
-                                new java.text.DecimalFormat("#.00").format(((float) add / 10)));
+                        this.dKick += ((float) add / 10);
                         this.toDamage += add;
                     }
                 }
@@ -203,7 +199,8 @@ public class Armor extends BaseItem{
         lore.add("§r§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
         lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim()));
         lore.add("§r§6◈§7护甲§6◈    §7+"+armor);
-        lore.add("§r§6◈§7韧性§6◈    §7+"+dKick);
+        lore.add("§r§6◈§7韧性§6◈    §7+"+(Double.parseDouble(
+                new java.text.DecimalFormat("#.0").format(dKick))));
         lore.add("§r§6◈§7血量§6◈    §7+"+health);
         lore.add("§r§6◈§7反伤§6◈    §7+"+toDamage);
         lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
@@ -258,10 +255,10 @@ public class Armor extends BaseItem{
 
     public static Armor getInstance(String name){
         if(Armor.inArray(name)){
-            if(RsWeapon.CaCheArmor.containsKey(name)){
-                return RsWeapon.CaCheArmor.get(name);
+            if(!RsWeapon.CaCheArmor.containsKey(name)){
+                RsWeapon.CaCheArmor.put(name,toArmor(name));
             }
-            return toArmor(name);
+            return RsWeapon.CaCheArmor.get(name);
         }
         return null;
     }
@@ -314,19 +311,19 @@ public class Armor extends BaseItem{
         return armor1;
     }
 
-    public void setRpgAttribute(String rpgAttribute) {
+    private void setRpgAttribute(String rpgAttribute) {
         this.rpgAttribute = rpgAttribute;
     }
 
-    public void setRpgLevel(int rpgLevel) {
+    private void setRpgLevel(int rpgLevel) {
         this.rpgLevel = rpgLevel;
     }
 
-    public void setRpgPF(int rpgPF) {
+    private void setRpgPF(int rpgPF) {
         this.rpgPF = rpgPF;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
 

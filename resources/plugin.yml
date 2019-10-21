@@ -1,8 +1,10 @@
 name: RSWeapon
 main: weapon.RsWeapon
-version: 1.2.7
+version: 1.4.5
 author: 若水
 api: 1.0.8
 load: STARTUP
+loadbefore:
+  - AutoUpData
 
 

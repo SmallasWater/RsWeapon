@@ -101,6 +101,7 @@ public abstract class BaseItem implements Cloneable{
 
 
 
+
     StringBuilder skillGetString(LinkedList<BaseEffect> effects, String type){
         StringBuilder builder = new StringBuilder();
         if(effects.size() == 0){
@@ -165,17 +166,33 @@ public abstract class BaseItem implements Cloneable{
         for (GemStone stone:gemStoneLinkedList) {
             if(isWeapon){
                 if(stone.getWeaponEffect().size() > 0){
-                    effects.addAll(stone.getWeaponEffect());
+                    for(BaseEffect effect:stone.getWeaponEffect()){
+                        if(!effects.contains(effect)){
+                            effects.add(effect);
+                        }
+                    }
                 }
                 if(stone.getWeaponDamages().size() > 0){
-                    damages.addAll(stone.getWeaponDamages());
+                    for(BaseEffect effect:stone.getWeaponDamages()){
+                        if(!damages.contains(effect)){
+                            damages.add(effect);
+                        }
+                    }
                 }
             }else{
                 if(stone.getArmorEffect().size() > 0){
-                    effects.addAll(stone.getArmorEffect());
+                    for(BaseEffect effect:stone.getArmorEffect()){
+                        if(!effects.contains(effect)){
+                            effects.add(effect);
+                        }
+                    }
                 }
                 if(stone.getArmorDamages().size() > 0){
-                    damages.addAll(stone.getArmorDamages());
+                    for(BaseEffect effect:stone.getArmorDamages()){
+                        if(!damages.contains(effect)){
+                            damages.add(effect);
+                        }
+                    }
                 }
             }
         }

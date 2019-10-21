@@ -115,7 +115,6 @@ public class GemStone extends BaseItem{
         int health = config.getInt("增加血量");
         LinkedList<BaseEffect> effects = new LinkedList<>();
         LinkedList<BaseEffect> damageEffect = new LinkedList<>();
-
         Map f = (Map) config.get(PlayerEffect.SHIELD);
         if(f.containsKey("抵抗伤害(%)") && (int) f.get("抵抗伤害(%)") > 0){
             effects.add(new PlayerEffect(PlayerEffect.SHIELD,(int)f.get("抵抗伤害(%)"),(int)f.get("冷却(s)")));

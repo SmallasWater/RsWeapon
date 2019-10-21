@@ -24,7 +24,7 @@ public class FixPlayerInventoryTask extends Task {
                 if(Weapon.isWeapon(item)){
                     if(!Weapon.inArray(Weapon.getWeaponName(item))){
                         player.sendMessage("§c检测到不存在武器--"+Weapon.getWeaponName(item)+"§c已移除");
-                        Weapon weapon = Weapon.getWeapon(item);
+                        Weapon weapon = Weapon.getInstance(item);
                         toAddStone(weapon,player);
                         player.getInventory().remove(item);
 
@@ -33,7 +33,7 @@ public class FixPlayerInventoryTask extends Task {
                 if(Armor.isArmor(item)){
                     if(!Armor.inArray(Armor.getArmorName(item))){
                         player.sendMessage("§c检测到不存在盔甲--"+Armor.getArmorName(item)+"§c已移除");
-                        Armor armor = Armor.getArmor(item);
+                        Armor armor = Armor.getInstance(item);
                         toAddStone(armor,player);
                         player.getInventory().remove(item);
                     }

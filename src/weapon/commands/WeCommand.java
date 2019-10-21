@@ -13,6 +13,7 @@ import weapon.items.GemStone;
 import weapon.items.Weapon;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class WeCommand extends Command {
@@ -109,6 +110,9 @@ public class WeCommand extends Command {
                         break;
                     case "reload":
                         commandSender.sendMessage(TextFormat.GOLD+"重新加载武器盔甲中...");
+                        RsWeapon.GemStones = new LinkedHashMap<>();
+                        RsWeapon.CaCheArmor = new LinkedHashMap<>();
+                        RsWeapon.CaCheWeapon = new LinkedHashMap<>();
                         RsWeapon.getInstance().loadArmor();
                         RsWeapon.getInstance().loadWeapon();
                         RsWeapon.getInstance().loadGemStone();

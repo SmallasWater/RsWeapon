@@ -70,17 +70,10 @@ public class Weapon extends BaseItem {
 
     public static Weapon getInstance(String name) {
         if(Weapon.inArray(name)){
-            if(RsWeapon.CaCheWeapon.containsKey(name)){
-                RsWeapon.CaCheWeapon.get(name);
+            if(!RsWeapon.CaCheWeapon.containsKey(name)){
+                RsWeapon.CaCheWeapon.put(name,toWeapon(name));
             }
-            return toWeapon(name);
-        }
-        return null;
-    }
-
-    public static Weapon getWeapon(Item item){
-        if(Weapon.isWeapon(item)){
-            return new Weapon(item);
+            return RsWeapon.CaCheWeapon.get(name);
         }
         return null;
     }
@@ -128,7 +121,7 @@ public class Weapon extends BaseItem {
         return effects;
     }
 
-    public void setMessage(String message) {
+    private void setMessage(String message) {
         this.message = message;
     }
 
@@ -172,16 +165,16 @@ public class Weapon extends BaseItem {
         return weapon;
     }
 
-    public void setRpgPF(int rpgPF) {
+    private void setRpgPF(int rpgPF) {
         this.rpgPF = rpgPF;
     }
 
-    public void setRpgLevel(int rpgLevel) {
+    private void setRpgLevel(int rpgLevel) {
         this.rpgLevel = rpgLevel;
     }
 
 
-    public void setRpgAttribute(String rpgAttribute) {
+    private void setRpgAttribute(String rpgAttribute) {
         this.rpgAttribute = rpgAttribute;
     }
 
@@ -189,7 +182,7 @@ public class Weapon extends BaseItem {
         this.name = name;
     }
 
-    private String getType() {
+    public String getType() {
         return type;
     }
 
@@ -239,7 +232,8 @@ public class Weapon extends BaseItem {
         lore.add("§r§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
         lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim())) ;
         lore.add("§r§6◈§7攻击§6◈ §a"+min+" - "+max);
-        lore.add("§r§6◈§7击退§6◈ §a"+kick);
+        lore.add("§r§6◈§7击退§6◈ §a"+(Double.parseDouble(
+                new java.text.DecimalFormat("#.0").format(kick))));
         lore.add("§r§6◈§7宝石§6◈ "+getStoneString(gemStoneLinkedList));
         lore.add("§r§6◈§f═§7╞════════════╡§f═");
         if(gemStoneLinkedList.size() > 0){
@@ -287,8 +281,7 @@ public class Weapon extends BaseItem {
                 for(int level = 1;level <= tag.getInt(tagName+"upData");level++){
                     int add =  RsWeapon.getInstance().getUpDataAttribute();
                     if(add > 0){
-                        this.kick += Double.parseDouble(
-                                new java.text.DecimalFormat("#.00").format(((float) add / 10)));
+                        this.kick += ((float) add / 10);
                         this.min += add;
                         this.max += add;
                     }

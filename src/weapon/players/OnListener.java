@@ -1,5 +1,7 @@
 package weapon.players;
 
+import AwakenSystem.data.baseAPI;
+import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
@@ -10,10 +12,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.player.PlayerDeathEvent;
-import cn.nukkit.event.player.PlayerItemHeldEvent;
-import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.event.player.PlayerMoveEvent;
+import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
@@ -31,6 +30,7 @@ import weapon.items.Weapon;
 import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
 import weapon.players.effects.PlayerEffect;
+import weapon.task.PlayerAddEffectTask;
 import weapon.task.PlayerAddHealthTask;
 import weapon.utils.Effects;
 import weapon.utils.PlayerAddAttributes;
@@ -40,19 +40,22 @@ import java.util.LinkedList;
 
 public class OnListener implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
         RsWeapon.playerHealth.put(player.getName(), player.getMaxHealth());
         Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddHealthTask(player),20);
-
+        Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddEffectTask(player),20);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDamage(EntityDamageEvent event){
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
             Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
+            if(damagePlayer == null || entity == null){
+                return;
+            }
             if(damagePlayer instanceof Player){
                 Item item = ((Player) damagePlayer).getInventory().getItemInHand();
                 if(Weapon.isWeapon(item)){
@@ -113,19 +116,31 @@ public class OnListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent event){
+        Player player = event.getPlayer();
+        if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
+            if(RsWeapon.addHealth.containsKey(player.getName())){
+                defaultAPI.removePlayerAttributeInt(player.getName()
+                        , baseAPI.PlayerAttType.HEALTH,RsWeapon.addHealth.get(player.getName()));
+                RsWeapon.addHealth.remove(player.getName());
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onEntity(EntityDamageEvent event){
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
             Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
+            if(damagePlayer == null || entity == null){
+                return;
+            }
             if(entity instanceof Player){
-                if(event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
-                    return;
-                }
                 PlayerEffects playerEffects2 = PlayerEffects.getInstance(entity.getName());
                 LinkedList<BaseEffect> entityEffects = PlayerAddAttributes.getEffects((Player) entity);
                 int dDamage = PlayerAddAttributes.getArmor((Player) entity);
                 double dKick = PlayerAddAttributes.getDKick((Player) entity);
-                float damage = event.getDamage();
+                float damage = event.getFinalDamage();
                 float kick = ((EntityDamageByEntityEvent) event).getKnockBack();
                 damage = damage - dDamage;
                 kick = kick - (float) dKick;
@@ -149,9 +164,11 @@ public class OnListener implements Listener {
                         }
                     }
                 }
-                if(toDamage > 0){
-                    float toD = damage * toDamage / 100;
-                    damagePlayer.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
+                if(!event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
+                    if(toDamage > 0){
+                        float toD = damage * toDamage / 100;
+                        damagePlayer.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
+                    }
                 }
                 event.setDamage(damage);
                 ((EntityDamageByEntityEvent) event).setKnockBack(kick);
@@ -168,7 +185,7 @@ public class OnListener implements Listener {
             if(damager instanceof Player){
                 Item item = ((Player) damager).getInventory().getItemInHand();
                 if(Weapon.isWeapon(item)){
-                    Weapon weapon = Weapon.getWeapon(item);
+                    Weapon weapon = Weapon.getInstance(item);
                     if(weapon != null){
                         event.setDeathMessage("");
                         Server.getInstance().broadcastMessage(weapon.getDeathMessage()
@@ -187,7 +204,7 @@ public class OnListener implements Listener {
         Player player = event.getPlayer();
         Item item = event.getItem();
         if(Weapon.isWeapon(item)){
-            Weapon weapon = Weapon.getWeapon(item);
+            Weapon weapon = Weapon.getInstance(item);
             if(weapon != null){
                 if(!weapon.canUseWeapon(player)){
                     player.sendMessage("§c此武器无法使用...");
@@ -195,7 +212,7 @@ public class OnListener implements Listener {
             }
         }
         if(Armor.isArmor(item)){
-            Armor armor = Armor.getArmor(item);
+            Armor armor = Armor.getInstance(item);
             if(!armor.canUseArmor(player)){
                 player.sendMessage("§c此盔甲无法使用...");
             }
