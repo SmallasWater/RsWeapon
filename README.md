@@ -1,5 +1,6 @@
 # RsWeapon 武器系统
-![cmd-markdown-logo](https://github.com/SmallasWater/RsWeapon/blob/master/resources/diamond_sword.png)
+
+![ABC](https://github.com/SmallasWater/RsWeapon/blob/master/resources/diamond_sword.png)
 ------
 ## 功能
 - [x] 高伤害的物品
@@ -17,10 +18,10 @@
 - [x] 技能系统
 
 ## 用法
-> /we help 主命令(OP) 
-  /click help 镶嵌宝石主命令 (Player) 
-  /强化 强化手中的武器或者盔甲 
-  /up 更新手中的 武器 盔甲 宝石 
+>  /we help 主命令(OP) 
+>  /click help 镶嵌宝石主命令 (Player) 
+>  /强化 强化手中的武器或者盔甲 
+>  /up 更新手中的 武器 盔甲 宝石 
   
 ## 开发者须知
 自定义增加技能
