@@ -110,6 +110,7 @@ public class WeCommand extends Command {
                         break;
                     case "reload":
                         commandSender.sendMessage(TextFormat.GOLD+"重新加载武器盔甲中...");
+                        RsWeapon.getInstance().loadSkill();
                         RsWeapon.GemStones = new LinkedHashMap<>();
                         RsWeapon.CaCheArmor = new LinkedHashMap<>();
                         RsWeapon.CaCheWeapon = new LinkedHashMap<>();

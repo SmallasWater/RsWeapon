@@ -127,7 +127,7 @@ public class OnListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onEntity(EntityDamageEvent event){
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
@@ -144,12 +144,7 @@ public class OnListener implements Listener {
                 float kick = ((EntityDamageByEntityEvent) event).getKnockBack();
                 damage = damage - dDamage;
                 kick = kick - (float) dKick;
-                if(kick < 0){
-                    kick = 0F;
-                }
-                if(damage < 0){
-                    damage = 0F;
-                }
+
                 int toDamage = PlayerAddAttributes.getToDamage((Player) entity);
                 for (BaseEffect effect:entityEffects){
                     if(effect instanceof PlayerEffect){
@@ -165,10 +160,18 @@ public class OnListener implements Listener {
                     }
                 }
                 if(!event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
-                    if(toDamage > 0){
-                        float toD = damage * toDamage / 100;
-                        damagePlayer.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
+                    if(damage > 0){
+                        if(toDamage > 0){
+                            float toD = damage * toDamage / 100;
+                            damagePlayer.attack(new EntityDamageEvent(entity,EntityDamageEvent.DamageCause.SUFFOCATION,toD));
+                        }
                     }
+                }
+                if(kick < 0){
+                    kick = 0F;
+                }
+                if(damage < 0){
+                    damage = 0F;
                 }
                 event.setDamage(damage);
                 ((EntityDamageByEntityEvent) event).setKnockBack(kick);

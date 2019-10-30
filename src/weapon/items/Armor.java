@@ -3,6 +3,7 @@ package weapon.items;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
@@ -14,6 +15,7 @@ import weapon.players.effects.BaseEffect;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class Armor extends BaseItem{
@@ -288,8 +290,11 @@ public class Armor extends BaseItem{
         int toDamage = config.getInt("反伤");
         double dKick = config.getDouble("抗击退");
         int level = config.getInt("盔甲品阶");
-        Map enchant = (Map) config.get("盔甲附魔");
-        item.addEnchantment(BaseItem.getEnchant(enchant));
+        List<Map> enchant = config.getMapList("盔甲附魔");
+        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+        for (Enchantment aura : enchants){
+            item.addEnchantment(aura);
+        }
         Map rgb = (Map) config.get("盔甲染色");
         int r = (int) rgb.get("r");
         int g = (int) rgb.get("g");

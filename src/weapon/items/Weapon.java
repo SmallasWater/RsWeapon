@@ -1,10 +1,9 @@
 package weapon.items;
 
-import AwakenSystem.data.baseAPI;
-import AwakenSystem.data.defaultAPI;
+
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.Config;
@@ -12,10 +11,7 @@ import me.onebone.economyapi.EconomyAPI;
 import weapon.RsWeapon;
 import weapon.players.effects.BaseEffect;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Weapon extends BaseItem {
 
@@ -144,9 +140,11 @@ public class Weapon extends BaseItem {
         }
         double kick = config.getDouble("武器击退");
         int level = config.getInt("武器品阶");
-        Map enchant = (Map) config.get("武器附魔");
-        item.addEnchantment(BaseItem.getEnchant(enchant));
-
+        List<Map> enchant = config.getMapList("武器附魔");
+        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+        for (Enchantment aura : enchants){
+            item.addEnchantment(aura);
+        }
         int count = config.getInt("镶嵌数量");
 
         boolean un = config.getBoolean("无限耐久");

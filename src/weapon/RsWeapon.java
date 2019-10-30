@@ -20,11 +20,14 @@ import weapon.players.OnListener;
 import weapon.players.PlayerEffects;
 import weapon.task.FixPlayerInventoryTask;
 import weapon.task.ForeachPlayersTask;
+import weapon.utils.RsWeaponSkill;
+import weapon.utils.Skill;
 
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -56,6 +59,7 @@ public class RsWeapon extends PluginBase {
     public static LinkedHashMap<String, Weapon> CaCheWeapon = new LinkedHashMap<>();
 
     public static LinkedHashMap<String, Armor> CaCheArmor = new LinkedHashMap<>();
+
 
 
 
@@ -102,7 +106,13 @@ public class RsWeapon extends PluginBase {
                 Server.getInstance().getLogger().info("/Armor文件夹创建失败");
             }
         }
+        if(!getSkillFile().exists()){
+            saveResource("skill.yml");
+        }
         this.getLogger().info("开始加载配置文件");
+        this.getLogger().info("开始读取技能列表");
+        loadSkill();
+        this.getLogger().info("技能读取完毕");
         long t1 = System.currentTimeMillis();
         this.getLogger().info("开始加载宝石..");
         loadGemStone();
@@ -141,6 +151,10 @@ public class RsWeapon extends PluginBase {
         return new File(this.getDataFolder()+"/Armor");
     }
 
+    public File getSkillFile(){
+        return new File(this.getDataFolder()+"/skill.yml");
+    }
+
     public LinkedList<ItemLevel> initLevel(){
         LinkedList<ItemLevel> levels = new LinkedList<>();
         Config config = this.getConfig();
@@ -161,9 +175,24 @@ public class RsWeapon extends PluginBase {
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
                     GemStones.put(names,GemStone.getInstance(names));
-                    this.getLogger().info(names+" 宝石加载成功");
                 }
             }
+        }
+    }
+
+    public void loadSkill() {
+        RsWeaponSkill.cleanSkill();
+        if(!getSkillFile().exists()){
+            saveResource("skill.yml");
+        }
+        Config config = new Config(getSkillFile(),Config.YAML);
+        Map<String,Object> map = config.getAll();
+        for (String skillName:map.keySet()) {
+            Map values = (Map) map.get(skillName);
+            String message = (String) values.get("效果内容");
+            String type = (String) values.get("类型");
+            List canUse = (List) values.get("可用装备");
+            RsWeaponSkill.addSkill(new Skill(skillName,message,type,(String[])canUse.toArray(new String[0])));
         }
     }
 
@@ -175,7 +204,6 @@ public class RsWeapon extends PluginBase {
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
                     CaCheWeapon.put(names,Weapon.getInstance(names));
-                    this.getLogger().info(names+" 武器加载成功");
                 }
             }
         }
@@ -189,7 +217,6 @@ public class RsWeapon extends PluginBase {
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
                     CaCheArmor.put(names,Armor.getInstance(names));
-                    this.getLogger().info(names+" 盔甲加载成功");
                 }
             }
         }

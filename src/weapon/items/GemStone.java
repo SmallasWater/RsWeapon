@@ -1,7 +1,9 @@
 package weapon.items;
 
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Config;
@@ -9,27 +11,24 @@ import weapon.RsWeapon;
 import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
 import weapon.players.effects.PlayerEffect;
+import weapon.utils.RsWeaponSkill;
+import weapon.utils.Skill;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class GemStone extends BaseItem{
 
     private static final String TAG_NAME = "RsWeapon_Stone";
 
-    private LinkedList<String> weaponEffect = new LinkedList<String>(){
-        {
-            add(PlayerEffect.ICE);
-            add(PlayerEffect.FRAME);
-            add(PlayerEffect.FRAME);
-            add(PlayerEffect.ADD_HEALTH);
-            add(PlayerEffect.LIGHTNING);
-        }
-    };
+    private static final String EFFECT = "效果";
+
+    private static final String COLD = "冷却(s)";
+
+    public static final  String WEAPON = "武器";
+
+    public static final  String ARMOR = "盔甲";
 
     private String name;
 
@@ -115,39 +114,36 @@ public class GemStone extends BaseItem{
         int health = config.getInt("增加血量");
         LinkedList<BaseEffect> effects = new LinkedList<>();
         LinkedList<BaseEffect> damageEffect = new LinkedList<>();
-        Map f = (Map) config.get(PlayerEffect.SHIELD);
-        if(f.containsKey("抵抗伤害(%)") && (int) f.get("抵抗伤害(%)") > 0){
-            effects.add(new PlayerEffect(PlayerEffect.SHIELD,(int)f.get("抵抗伤害(%)"),(int)f.get("冷却(s)")));
+        Map skill =(Map) config.get("技能");
+        for(Object skillName:skill.keySet()){
+            if(skillName instanceof String){
+                Skill skills = RsWeaponSkill.getSkill((String) skillName);
+                if(skills != null){
+                    Map f = (Map) skill.get(skills.getName());
+                    if(skills.getType().equals(Skill.PASSIVE)){
+                        if(f.containsKey(EFFECT) && (int) f.get(EFFECT) > 0){
+                            effects.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                        }
+                    }else if(skills.getType().equals(Skill.ACTIVE)){
+                        if(f.containsKey(EFFECT) &&(int)f.get(EFFECT) > 0){
+                            damageEffect.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                        }
+                    }
+                }
+            }
         }
-
-        Map addHealth = (Map) config.get(PlayerEffect.ADD_HEALTH);
-        if(addHealth.containsKey("吸收伤害(%)") &&(int)addHealth.get("吸收伤害(%)") > 0){
-            damageEffect.add(new PlayerEffect(PlayerEffect.ADD_HEALTH,(int)addHealth.get("吸收伤害(%)"),(int)addHealth.get("冷却(s)")));
-        }
-
         Map eff = (Map) config.get("药水");
         Map me = (Map) eff.get("己方");
         effects.addAll(GemStone.effects(me));
-        Map f1 = (Map) config.get(PlayerEffect.ICE);
-        if(f1.containsKey("持续时间(s)") && (int)f1.get("持续时间(s)") > 0){
-            damageEffect.add(new PlayerEffect(PlayerEffect.ICE,(int)f1.get("持续时间(s)"),(int)f1.get("冷却(s)")));
-        }
-
-        Map f2 = (Map) config.get(PlayerEffect.FRAME);
-        if(f2.containsKey("持续时间(s)") &&(int)f2.get("持续时间(s)") > 0){
-            damageEffect.add(new PlayerEffect(PlayerEffect.FRAME,(int)f2.get("持续时间(s)"),(int)f2.get("冷却(s)")));
-        }
-        Map f3 = (Map) config.get(PlayerEffect.LIGHTNING);
-        if(f3.containsKey("伤害") && (int)f3.get("伤害") > 0){
-            damageEffect.add(new PlayerEffect(PlayerEffect.LIGHTNING,(int)f3.get("伤害"),(int)f3.get("冷却(s)")));
-        }
         Map damage = (Map) eff.get("敌方");
         damageEffect.addAll(GemStone.effects(damage));
 
         int level = config.getInt("宝石品阶");
-        Map enchant = (Map) config.get("宝石附魔");
-        item.addEnchantment(BaseItem.getEnchant(enchant));
-
+        List<Map> enchant = config.getMapList("宝石附魔");
+        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+        for (Enchantment aura : enchants){
+            item.addEnchantment(aura);
+        }
         GemStone stone = new GemStone(item,level,xLevel,xItem,min,max,toDamage,armor,dKick ,kick,health,effects,damageEffect);
         stone.setMessage(message);
         stone.setType(type);
@@ -205,7 +201,6 @@ public class GemStone extends BaseItem{
             Config config = new Config(RsWeapon.getInstance().getGemFile()+"/"+name+".yml",Config.YAML);
             config.set("宝石外形",id);
             config.save();
-
             RsWeapon.GemStones.put(name,toGemStone(name));
         }
     }
@@ -290,7 +285,7 @@ public class GemStone extends BaseItem{
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈§f宝石品阶     §6◈"+RsWeapon.levels.get(level).getName());
-        lore.add("§r§6◈§f可镶嵌       §6◈"+xItem);
+        lore.add("§r§6◈§f可镶嵌       §6◈"+(xItem.size() > 0?xItem:"§c不可镶嵌"));
         lore.add("§r§6◈§f限制品阶     §6◈"+RsWeapon.levels.get(xLevel).getName());
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r"+message.trim());
@@ -379,6 +374,20 @@ public class GemStone extends BaseItem{
         return effect;
     }
 
+    public void addSkill(Skill skill,int time,int cold){
+        if(skill.equalsUse(WEAPON)){
+            if(skill.getType().equals(Skill.ACTIVE)){
+                damages.add(new PlayerEffect(skill.getName(),time,cold));
+            }else{
+                effect.add(new PlayerEffect(skill.getName(),time,cold));
+            }
+        }else if(skill.equalsUse(ARMOR)){
+            if(!skill.getType().equals(Skill.ACTIVE)){
+                effect.add(new PlayerEffect(skill.getName(),time,cold));
+            }
+        }
+    }
+
 
     public LinkedList<BaseEffect> getWeaponDamages(){
         return baseEffects(damages,true,true);
@@ -403,12 +412,7 @@ public class GemStone extends BaseItem{
             for (BaseEffect effect:baseEffects){
                 if(isWeapon){
                     if(isDamage){
-                        if(effect instanceof PlayerEffect){
-                            if(!weaponEffect.contains(((PlayerEffect) effect).getBufferName())){
-                                continue;
-                            }
-                        }
-                        effects.add(effect);
+                        canAdd(effects, effect, WEAPON);
                     }else{
                         if(effect instanceof PlayerEffect){
                             continue;
@@ -417,17 +421,26 @@ public class GemStone extends BaseItem{
                     }
                 }else{
                     if(!isDamage){
-                        if(effect instanceof PlayerEffect){
-                            if(weaponEffect.contains(((PlayerEffect) effect).getBufferName())){
-                                continue;
-                            }
-                        }
-                        effects.add(effect);
+                        canAdd(effects, effect, ARMOR);
                     }
                 }
             }
         }
         return effects;
+    }
+
+    private void canAdd(LinkedList<BaseEffect> effects, BaseEffect effect, String weapon) {
+        if(effect instanceof PlayerEffect){
+            Skill skill = RsWeaponSkill.getSkill(((PlayerEffect) effect).getBufferName());
+            if(skill != null){
+                if(!skill.equalsUse(weapon)){
+                    return;
+                }
+            }else{
+                return;
+            }
+        }
+        effects.add(effect);
     }
 
     @Override

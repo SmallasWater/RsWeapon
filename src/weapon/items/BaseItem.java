@@ -13,6 +13,8 @@ import cn.nukkit.nbt.tag.StringTag;
 import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
 import weapon.players.effects.PlayerEffect;
+import weapon.utils.RsWeaponSkill;
+import weapon.utils.Skill;
 
 import java.util.*;
 
@@ -29,15 +31,21 @@ public abstract class BaseItem implements Cloneable{
         return Item.fromString(id);
     }
 
-    static Enchantment getEnchant(Map enchant){
-        int eid = 0,l = 0;
-        if(enchant.containsKey("id")){
-            eid = (int) enchant.get("id");
+    static ArrayList<Enchantment> getEnchant( List<Map> ench){
+        ArrayList<Enchantment> m = new ArrayList<>();
+        for (Map enchant:ench){
+            int eid = 0,l = 0;
+            if(enchant.containsKey("id")){
+                eid = (int) enchant.get("id");
+            }
+            if(enchant.containsKey("level")){
+                l = (int) enchant.get("level");
+            }
+            if(l > 0){
+                m.add(Enchantment.getEnchantment(eid).setLevel(l));
+            }
         }
-        if(enchant.containsKey("level")){
-            l = (int) enchant.get("level");
-        }
-        return Enchantment.getEnchantment(eid).setLevel(l);
+        return m;
     }
 
     public CompoundTag getCompoundTag(){
@@ -110,32 +118,22 @@ public abstract class BaseItem implements Cloneable{
         }
         for(BaseEffect effect:effects){
             if(effect instanceof PlayerEffect){
-                builder.append("§r")
-                        .append(type)
-                        .append("§r")
-                        .append(((PlayerEffect) effect).getBufferName()).append("\n");
-                if(PlayerEffect.SHIELD.equals(((PlayerEffect) effect).getBufferName())){
-                    builder.append("§7抵抗伤害: ");
-                    builder.append(effect.getTime()).append(" % ");
-                }else if(PlayerEffect.ADD_HEALTH.equals(((PlayerEffect) effect).getBufferName())) {
-                    builder.append("§7吸收伤害: ");
-                    builder.append(effect.getTime()).append(" % ");
-                }else if(PlayerEffect.LIGHTNING.equals(((PlayerEffect) effect).getBufferName())){
-                    builder.append("§7伤害: ");
-                    builder.append(effect.getTime());
-                }else{
-                    builder.append("§7持续: ");
-                    builder.append(effect.getTime()).append(" 秒 ");
+                Skill skill = RsWeaponSkill.getSkill(((PlayerEffect) effect).getBufferName());
+                if(skill != null){
+                    builder.append("§r")
+                            .append(type)
+                            .append("§r")
+                            .append(((PlayerEffect) effect).getBufferName()).append("\n");
+                    builder.append(skill.getMessage().replace("%i%",effect.getTime()+"")
+                            .replace("%cold%",effect.getCold()+""))
+                            .append("\n");
                 }
-                builder.append("§7冷却: ")
-                        .append(effect.getCold()).append(" 秒")
-                        .append("\n");
             }
             if(effect instanceof MineCraftEffect){
                 builder.append("§r")
                         .append(type)
                         .append("§r")
-                        .append(BaseItem.getEffectStringById(((MineCraftEffect) effect).getEffect().getId()))
+                        .append(BaseItem.getEffectStringById(((MineCraftEffect) effect).getEffect().getId())).append(" ")
                         .append(BaseItem.getLevelByString(((MineCraftEffect) effect).getEffect().getAmplifier())).append("\n")
                         .append("§7持续: ")
                         .append(effect.getTime()).append(" 秒 ")
