@@ -1,6 +1,6 @@
 # RsWeapon
 
-![logo](https://github.com/SmallasWater/RsWeapon/blob/master/resources/logo.jpg)
+![logo](https://github.com/SmallasWater/RsWeapon/blob/master/resources/logo.png)
 ------
 ## 功能
 - [x] 高伤害的物品
