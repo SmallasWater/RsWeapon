@@ -1,13 +1,19 @@
-![cmd-markdown-logo](https://github.com/SmallasWater/RsWeapon/blob/master/resources/diamond_sword.png)
 # RsWeapon 武器系统
+![cmd-markdown-logo](https://github.com/SmallasWater/RsWeapon/blob/master/resources/diamond_sword.png)
 ------
 ## 功能
 - [x] 高伤害的物品
+
 - [x] 自定义物品附魔
+
 - [x] 盔甲系统
+
 - [x] 宝石镶嵌系统
+
 - [x] 强化系统
+
 - [x] 对接 RPG等级系统
+
 - [x] 技能系统
 
 ## 用法
