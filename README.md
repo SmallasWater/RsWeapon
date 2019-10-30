@@ -1,6 +1,6 @@
 # RsWeapon 武器系统
 
-![ABC](https://github.com/SmallasWater/RsWeapon/blob/master/resources/diamond_sword.png)
+![ABC](resources/diamond_sword.png)
 ------
 ## 功能
 - [x] 高伤害的物品
