@@ -2,12 +2,11 @@ package weapon.players.effects;
 
 
 import cn.nukkit.potion.Effect;
+import weapon.items.BaseItem;
 
 public class MineCraftEffect extends BaseEffect{
 
     private Effect effect;
-
-
 
     public MineCraftEffect(Effect buffer,int cold) {
         this.effect = buffer;
@@ -20,6 +19,12 @@ public class MineCraftEffect extends BaseEffect{
     }
 
     @Override
+    public String getBufferName() {
+        return BaseItem.getEffectStringById((effect.getId()))
+                        +" "+BaseItem.getLevelByString(effect.getAmplifier());
+    }
+
+    @Override
     public boolean equals(Object effect) {
         if(effect instanceof MineCraftEffect){
             return (this.effect.getId() == ((MineCraftEffect) effect).effect.getId());
@@ -27,26 +32,6 @@ public class MineCraftEffect extends BaseEffect{
         return false;
     }
 
-    @Override
-    public int getCold() {
-        return this.cold;
-    }
-
-    @Override
-    public int getTime() {
-        return this.time;
-    }
-
-    @Override
-    public void setTime(int time) {
-        this.time = time;
-    }
-
-    @Override
-    public void setCold(int cold) {
-        this.cold = cold;
-
-    }
 
     @Override
     public MineCraftEffect clone() {

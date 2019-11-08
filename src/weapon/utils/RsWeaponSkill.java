@@ -9,7 +9,14 @@ public class RsWeaponSkill {
     public static void addSkill(Skill skill){
         if (!skillList.contains(skill)) {
             skillList.add(skill);
+        }else{
+           skillList.remove(skill);
+           skillList.add(skill);
         }
+    }
+
+    public static LinkedList<Skill> getSkillList() {
+        return skillList;
     }
 
     public static Skill getSkill(String name){
@@ -29,10 +36,8 @@ public class RsWeaponSkill {
         }
     }
 
-    public static void cleanSkill(){
-        skillList = new LinkedList<>();
 
-    }
+
 
 
 

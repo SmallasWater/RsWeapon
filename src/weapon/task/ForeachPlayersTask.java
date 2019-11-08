@@ -4,9 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.scheduler.Task;
 import weapon.RsWeapon;
-import weapon.players.PlayerEffects;
+import weapon.players.effects.PlayerEffects;
 import weapon.task.async.SkillCoolingTimer;
-import weapon.task.async.SkillDamageTimer;
+
 
 public class ForeachPlayersTask extends Task {
 
@@ -24,7 +24,7 @@ public class ForeachPlayersTask extends Task {
                 PlayerEffects effects = RsWeapon.damages.get(player.getName());
                 if(effects.getEffects().size() > 0){
                     Server.getInstance().getScheduler().scheduleAsyncTask(RsWeapon.getInstance(),
-                            new SkillDamageTimer(effects));
+                            new SkillCoolingTimer(effects,true));
                 }
             }
         }

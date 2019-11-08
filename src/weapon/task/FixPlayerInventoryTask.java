@@ -48,26 +48,30 @@ public class FixPlayerInventoryTask extends Task {
         }
     }
     private void toAddStone(BaseItem baseItem,Player player){
-        if(baseItem != null){
-            LinkedList<GemStone> stones = new LinkedList<>();
-            if(baseItem instanceof Weapon){
-                stones = ((Weapon) baseItem).getGemStones();
-            }else if(baseItem instanceof Armor){
-                stones = ((Armor) baseItem).getGemStones();
-            }
-            if(stones.size() > 0){
-                for (GemStone stone: stones) {
-                    if(GemStone.inArray(stone.getName())){
-                        Item stoneItem = stone.toItem();
-                        if(player.getInventory().canAddItem(stoneItem)){
-                            player.getInventory().addItem(stoneItem);
-                            player.sendMessage("§a返还宝石: "+stone.getName());
+        try{
+            if(baseItem != null){
+                LinkedList<GemStone> stones = new LinkedList<>();
+                if(baseItem instanceof Weapon){
+                    stones = ((Weapon) baseItem).getGemStones();
+                }else if(baseItem instanceof Armor){
+                    stones = ((Armor) baseItem).getGemStones();
+                }
+                if(stones.size() > 0){
+                    for (GemStone stone: stones) {
+                        if(GemStone.inArray(stone.getName())){
+                            Item stoneItem = stone.toItem();
+                            if(player.getInventory().canAddItem(stoneItem)){
+                                player.getInventory().addItem(stoneItem);
+                                player.sendMessage("§a返还宝石: "+stone.getName());
+                            }
+                        }else{
+                            player.sendMessage("§c永久损失宝石: "+stone.getName());
                         }
-                    }else{
-                        player.sendMessage("§c永久损失宝石: "+stone.getName());
                     }
                 }
             }
+        }catch(Exception ignored){
         }
+
     }
 }

@@ -3,7 +3,7 @@ package weapon.task;
 import cn.nukkit.Player;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.scheduler.Task;
-import weapon.players.PlayerEffects;
+import weapon.players.effects.PlayerEffects;
 import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
 import weapon.utils.PlayerAddAttributes;

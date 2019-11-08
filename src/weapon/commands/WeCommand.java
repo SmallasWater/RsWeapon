@@ -11,6 +11,7 @@ import weapon.RsWeapon;
 import weapon.items.Armor;
 import weapon.items.GemStone;
 import weapon.items.Weapon;
+import weapon.utils.RsWeaponSkill;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;

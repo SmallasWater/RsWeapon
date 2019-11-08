@@ -7,17 +7,13 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
 import updata.AutoData;
-import updata.utils.UpData;
-import weapon.commands.ClickCommand;
-import weapon.commands.ReloadCommand;
-import weapon.commands.UpDataCommand;
-import weapon.commands.WeCommand;
+import weapon.commands.*;
 import weapon.items.Armor;
 import weapon.items.GemStone;
 import weapon.items.ItemLevel;
 import weapon.items.Weapon;
 import weapon.players.OnListener;
-import weapon.players.PlayerEffects;
+import weapon.players.effects.PlayerEffects;
 import weapon.task.FixPlayerInventoryTask;
 import weapon.task.ForeachPlayersTask;
 import weapon.utils.RsWeaponSkill;
@@ -68,20 +64,8 @@ public class RsWeapon extends PluginBase {
     public void onEnable() {
         instance = this;
         if(Server.getInstance().getPluginManager().getPlugin("AutoUpData") != null){
-            UpData data = AutoData.get(this,getFile(),"SmallasWater","RsWeapon");
-            if(data == null){
-                this.getLogger().info("更新检查失败");
-            }else{
-                if(data.canUpdate()){
-                    this.getLogger().info("有可用新版本 v"+data.getNewVersion());
-                    this.getLogger().info("更新内容 "+data.getNewVersionMessage());
-                    if(!data.toUpData()){
-                        this.getLogger().info("更新失败");
-                    }else{
-                        this.getLogger().info("更新完成");
-
-                    }
-                }
+            if(AutoData.defaultUpData(this,getFile(),"SmallasWater","RsWeapon")){
+                return;
             }
         }
         File gemFiles = getGemFile();
@@ -130,6 +114,7 @@ public class RsWeapon extends PluginBase {
         this.getServer().getCommandMap().register("",new WeCommand("we"));
         this.getServer().getCommandMap().register("",new ReloadCommand("up"));
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
+        this.getServer().getCommandMap().register("",new ShowMessageCommand("wm"));
         long t2 = System.currentTimeMillis();
         this.getLogger().info("配置加载完成 用时:"+((t2 - t1) % (1000 * 60))+"ms");
         this.getLogger().info("武器系统加载成功..作者: 若水");
@@ -151,7 +136,7 @@ public class RsWeapon extends PluginBase {
         return new File(this.getDataFolder()+"/Armor");
     }
 
-    public File getSkillFile(){
+    private File getSkillFile(){
         return new File(this.getDataFolder()+"/skill.yml");
     }
 
@@ -175,13 +160,13 @@ public class RsWeapon extends PluginBase {
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
                     GemStones.put(names,GemStone.getInstance(names));
+
                 }
             }
         }
     }
 
     public void loadSkill() {
-        RsWeaponSkill.cleanSkill();
         if(!getSkillFile().exists()){
             saveResource("skill.yml");
         }

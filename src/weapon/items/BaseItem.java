@@ -31,7 +31,7 @@ public abstract class BaseItem implements Cloneable{
         return Item.fromString(id);
     }
 
-    static ArrayList<Enchantment> getEnchant( List<Map> ench){
+    static ArrayList<Enchantment> getEnchant(List<Map> ench){
         ArrayList<Enchantment> m = new ArrayList<>();
         for (Map enchant:ench){
             int eid = 0,l = 0;
@@ -99,7 +99,7 @@ public abstract class BaseItem implements Cloneable{
     }
 
     public static String getLevelByString(int level){
-        String[] array = new String[]{"","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"};
+        String[] array = new String[]{"I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII"};
         if(level <= 12){
             return array[level];
         }else{
@@ -118,12 +118,12 @@ public abstract class BaseItem implements Cloneable{
         }
         for(BaseEffect effect:effects){
             if(effect instanceof PlayerEffect){
-                Skill skill = RsWeaponSkill.getSkill(((PlayerEffect) effect).getBufferName());
+                Skill skill = RsWeaponSkill.getSkill(effect.getBufferName());
                 if(skill != null){
                     builder.append("§r")
                             .append(type)
                             .append("§r")
-                            .append(((PlayerEffect) effect).getBufferName()).append("\n");
+                            .append(effect.getBufferName()).append("\n");
                     builder.append(skill.getMessage().replace("%i%",effect.getTime()+"")
                             .replace("%cold%",effect.getCold()+""))
                             .append("\n");
@@ -133,8 +133,7 @@ public abstract class BaseItem implements Cloneable{
                 builder.append("§r")
                         .append(type)
                         .append("§r")
-                        .append(BaseItem.getEffectStringById(((MineCraftEffect) effect).getEffect().getId())).append(" ")
-                        .append(BaseItem.getLevelByString(((MineCraftEffect) effect).getEffect().getAmplifier())).append("\n")
+                        .append(effect.getBufferName()).append("\n")
                         .append("§7持续: ")
                         .append(effect.getTime()).append(" 秒 ")
                         .append("§7冷却: ")

@@ -1,7 +1,6 @@
 package weapon.items;
 
 
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -114,30 +113,58 @@ public class GemStone extends BaseItem{
         int health = config.getInt("增加血量");
         LinkedList<BaseEffect> effects = new LinkedList<>();
         LinkedList<BaseEffect> damageEffect = new LinkedList<>();
-        Map skill =(Map) config.get("技能");
-        for(Object skillName:skill.keySet()){
-            if(skillName instanceof String){
-                Skill skills = RsWeaponSkill.getSkill((String) skillName);
-                if(skills != null){
-                    Map f = (Map) skill.get(skills.getName());
-                    if(skills.getType().equals(Skill.PASSIVE)){
-                        if(f.containsKey(EFFECT) && (int) f.get(EFFECT) > 0){
-                            effects.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+        Object skillObject = config.get("技能");
+        if(skillObject instanceof Map){
+            Map skill = (Map) skillObject;
+            for(Object skillName:skill.keySet()){
+                if(skillName instanceof String){
+                    Skill skills = RsWeaponSkill.getSkill((String) skillName);
+                    if(skills != null){
+                        Map f = (Map) skill.get(skills.getName());
+                        if(skills.getType().equals(Skill.PASSIVE)){
+                            if(f.containsKey(EFFECT) && (int) f.get(EFFECT) > 0){
+                                effects.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                            }
+                        }else if(skills.getType().equals(Skill.ACTIVE)){
+                            if(f.containsKey(EFFECT) &&(int)f.get(EFFECT) > 0){
+                                damageEffect.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                            }
                         }
-                    }else if(skills.getType().equals(Skill.ACTIVE)){
-                        if(f.containsKey(EFFECT) &&(int)f.get(EFFECT) > 0){
-                            damageEffect.add(new PlayerEffect(skills.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                    }
+                }
+            }
+        }else{
+            /* 保留旧版....*/
+            for(Skill skillName:RsWeaponSkill.getSkillList()){
+                Map f = (Map) config.get(skillName.getName());
+                if(f != null){
+                    if(skillName.getType().equals(Skill.PASSIVE)){
+                        if(f.containsKey(EFFECT) && (int) f.get(EFFECT) > 0){
+                            effects.add(new PlayerEffect(skillName.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
+                        }
+                    }else if(skillName.getType().equals(Skill.ACTIVE)){
+                        if(f.containsKey(EFFECT) && (int)f.get(EFFECT) > 0){
+                            damageEffect.add(new PlayerEffect(skillName.getName(),(int)f.get(EFFECT),(int)f.get(COLD)));
                         }
                     }
                 }
             }
         }
         Map eff = (Map) config.get("药水");
-        Map me = (Map) eff.get("己方");
-        effects.addAll(GemStone.effects(me));
-        Map damage = (Map) eff.get("敌方");
-        damageEffect.addAll(GemStone.effects(damage));
-
+        Object obj = eff.get("己方");
+        if(obj instanceof Map){
+            Map me = (Map) obj;
+            if(me.size() > 0){
+                effects.addAll(GemStone.effects(me));
+            }
+        }
+        obj = eff.get("敌方");
+        if(obj instanceof Map){
+            Map damage = (Map) obj;
+            if(damage.size() > 0){
+                damageEffect.addAll(GemStone.effects(damage));
+            }
+        }
         int level = config.getInt("宝石品阶");
         List<Map> enchant = config.getMapList("宝石附魔");
         ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
@@ -281,7 +308,7 @@ public class GemStone extends BaseItem{
         return item;
     }
 
-    private String[] lore(){
+    public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈§f宝石品阶     §6◈"+RsWeapon.levels.get(level).getName());
@@ -431,7 +458,7 @@ public class GemStone extends BaseItem{
 
     private void canAdd(LinkedList<BaseEffect> effects, BaseEffect effect, String weapon) {
         if(effect instanceof PlayerEffect){
-            Skill skill = RsWeaponSkill.getSkill(((PlayerEffect) effect).getBufferName());
+            Skill skill = RsWeaponSkill.getSkill(effect.getBufferName());
             if(skill != null){
                 if(!skill.equalsUse(weapon)){
                     return;

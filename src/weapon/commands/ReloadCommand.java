@@ -28,10 +28,12 @@ public class ReloadCommand extends Command {
                 }
             }else if(Armor.isArmor(item)){
                 Armor armor = Armor.getInstance(item);
-                ((Player) commandSender).getInventory().setItemInHand(armor.toItem());
-                commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                commandSender.sendMessage("§r§b盔甲已重置");
-                commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                if(armor != null){
+                    ((Player) commandSender).getInventory().setItemInHand(armor.toItem());
+                    commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                    commandSender.sendMessage("§r§b盔甲已重置");
+                    commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                }
             }else if(GemStone.isGemStone(item)){
                 GemStone gemstone = GemStone.getInstance(item);
                 if(gemstone != null){

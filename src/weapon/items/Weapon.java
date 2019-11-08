@@ -198,6 +198,9 @@ public class Weapon extends BaseItem {
     @Override
     public CompoundTag getCompoundTag(){
         CompoundTag tag = item.getNamedTag();
+        if(tag == null){
+            tag = new CompoundTag();
+        }
         return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
     }
 
@@ -222,7 +225,7 @@ public class Weapon extends BaseItem {
     }
 
 
-    private String[] lore(){//13
+    public String[] lore(){//13
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈类型   §6◈§a武器");

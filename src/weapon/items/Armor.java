@@ -94,7 +94,10 @@ public class Armor extends BaseItem{
     }
 
     public static Armor getInstance(Item item){
-        return new Armor(item);
+        if(isArmor(item)){
+            return new Armor(item);
+        }
+        return null;
     }
 
     public String getName() {
@@ -141,6 +144,9 @@ public class Armor extends BaseItem{
     @Override
     public CompoundTag getCompoundTag() {
         CompoundTag tag = item.getNamedTag();
+        if(tag == null){
+            tag = new CompoundTag();
+        }
         return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
     }
 
@@ -193,7 +199,7 @@ public class Armor extends BaseItem{
 
 
 
-    private String[] lore(){
+    public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈类型   ◈§e盔甲");
