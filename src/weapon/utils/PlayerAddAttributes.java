@@ -19,7 +19,7 @@ public class PlayerAddAttributes {
         if(Weapon.isWeapon(item)){
             Weapon weapon = Weapon.getInstance(item);
             if(weapon != null){
-                if(weapon.canUseWeapon(player)){
+                if(weapon.canUse(player)){
                     items.add(weapon);
                 }
             }
@@ -27,8 +27,10 @@ public class PlayerAddAttributes {
         for (Item armorItem:player.getInventory().getArmorContents()){
             if(Armor.isArmor(armorItem)){
                 Armor armor = Armor.getInstance(armorItem);
-                if(armor.canUseArmor(player)){
-                    items.add(armor);
+                if(armor != null){
+                    if(armor.canUse(player)){
+                        items.add(armor);
+                    }
                 }
             }
         }

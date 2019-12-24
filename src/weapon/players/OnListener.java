@@ -18,6 +18,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.TextFormat;
 import weapon.RsWeapon;
 import weapon.items.Armor;
+import weapon.items.BaseItem;
 import weapon.items.Weapon;
 import weapon.players.effects.BaseEffect;
 import weapon.players.effects.MineCraftEffect;
@@ -43,8 +44,11 @@ public class OnListener implements Listener {
         Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddEffectTask(player),20);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onDamage(EntityDamageEvent event){
+        if(event.isCancelled()){
+            return;
+        }
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
             Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
@@ -65,7 +69,7 @@ public class OnListener implements Listener {
                         if(baseEffect instanceof PlayerEffect){
                             Skill skill = RsWeaponSkill.getSkill(baseEffect.getBufferName());
                             if(skill != null){
-                                addSkill(damagePlayer,entity,skill,baseEffect, event);
+                                addSkill(damagePlayer,entity,skill,baseEffect, (EntityDamageByEntityEvent) event);
                             }
                         }
                         addMineCraftEffects(entity, (Player) damagePlayer, playerEffects, baseEffect);
@@ -88,7 +92,7 @@ public class OnListener implements Listener {
         }
     }
 
-    private void addSkill(Entity damagePlayer,Entity entity,Skill skill,BaseEffect baseEffect,EntityDamageEvent event){
+    private void addSkill(Entity damagePlayer,Entity entity,Skill skill,BaseEffect baseEffect,EntityDamageByEntityEvent event){
         float damage = event.getDamage();
         PlayerEffects playerEffects = PlayerEffects.getInstance(damagePlayer.getName());
         if(playerEffects.containsEffect(baseEffect)){
@@ -138,6 +142,9 @@ public class OnListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntity(EntityDamageEvent event){
+        if(event.isCancelled()){
+            return;
+        }
         if(event instanceof EntityDamageByEntityEvent){
             Entity entity = event.getEntity();
             Entity damagePlayer = ((EntityDamageByEntityEvent) event).getDamager();
@@ -167,10 +174,12 @@ public class OnListener implements Listener {
                                     Effects.addRelief(entity);
                                 }
                             }
-                            addSkill(entity,damagePlayer,skill,effect,event);
+                            addSkill(entity,damagePlayer,skill,effect, (EntityDamageByEntityEvent) event);
                         }
                     }
-                    addMineCraftEffects(entity, (Player) damagePlayer, playerEffects2, effect);
+                    if(damagePlayer instanceof Player){
+                        addMineCraftEffects(entity, (Player) damagePlayer, playerEffects2, effect);
+                    }
                 }
                 if(!event.getCause().equals(EntityDamageEvent.DamageCause.SUFFOCATION)){
                     if(damage > 0){
@@ -191,6 +200,8 @@ public class OnListener implements Listener {
             }
         }
     }
+
+
 
     private void addMineCraftEffects(Entity entity, Player damagePlayer, PlayerEffects playerEffects2, BaseEffect effect) {
         if(effect instanceof MineCraftEffect){
@@ -231,22 +242,36 @@ public class OnListener implements Listener {
         Player player = event.getPlayer();
         Item item = event.getItem();
         if(Weapon.isWeapon(item)){
-            Weapon weapon = Weapon.getInstance(item);
+            BaseItem weapon = BaseItem.getBaseItem(item);
             if(weapon != null){
-                if(!weapon.canUseWeapon(player)){
-                    player.sendMessage("§c此武器无法使用...");
+                if(weapon.getMaster() != null){
+                    if(!weapon.getMaster().equals(player.getName())){
+                        player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        player.sendMessage("§r§e[武器认主]§c 你使用了不属于你的"+weapon.getName());
+                        player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        String target = weapon.getMaster();
+                        Player t = Server.getInstance().getPlayer(target);
+                        if(t != null){
+                            t.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                            t.sendMessage("§r§e[武器认主]§d 玩家: "+player.getName()+"手持了属于你的"+weapon.getName());
+                            if(t.getInventory().canAddItem(item)){
+                                t.sendMessage("§r§e[武器认主]§a 已自动回到你背包");
+                                player.getInventory().removeItem(item);
+                                t.getInventory().addItem(item);
+                            }else{
+                                t.sendMessage("§r§e[武器认主]§c 背包满啦，回不去..");
+                            }
+                            t.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        }
+                    }
+                    
+                }
+                if(!weapon.canUse(player)){
+                    player.sendMessage("§c此"+(weapon.isWeapon()?"武器":"盔甲")+"无法使用...");
                 }
             }
         }
-        if(Armor.isArmor(item)){
-            Armor armor = Armor.getInstance(item);
-            if(armor != null){
-                if(!armor.canUseArmor(player)){
-                    player.sendMessage("§c此盔甲无法使用...");
-                }
-            }
 
-        }
     }
 
 

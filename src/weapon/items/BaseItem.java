@@ -21,10 +21,53 @@ import java.util.*;
 /** @author 若水*/
 public abstract class BaseItem implements Cloneable{
 
-    int count;
+    String type;
+
+    int count,money;
     final static String TAG_NAME = "RsWeaponName";
     Item item;
+    String master;
 
+    String name;
+
+    String message;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+
+    public boolean upData(Player player){
+        return false;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public String getMaster() {
+        return master;
+    }
+
+    public boolean canSetMaster(){
+        return false;
+    }
+
+    public boolean setMaster(String name){
+        return false;
+    }
+
+    public boolean hasMaster(){
+        return master != null;
+    }
 
 
     static Item toItemByMap(String id){
@@ -202,6 +245,15 @@ public abstract class BaseItem implements Cloneable{
         return builder.toString();
     }
 
+    public boolean removeStone(GemStone stone){
+        return false;
+    }
+
+    public boolean canRemove(GemStone stone){
+        return false;
+
+    }
+
     StringBuilder getStoneString(LinkedList<GemStone> gemStoneLinkedList){
         StringBuilder builder = new StringBuilder();
         if(gemStoneLinkedList.size() > 0){
@@ -297,7 +349,52 @@ public abstract class BaseItem implements Cloneable{
         return true;
     }
 
+    public boolean canInlay(GemStone stone){
 
+        return false;
+    }
+
+    /**
+     * 显示lore信息
+     * @return lore数组
+     */
+    abstract public String[] lore();
+
+    public boolean inlayStone(GemStone stone){
+        return false;
+    }
+
+
+    public boolean canUse(Player player){
+        return true;
+    }
+
+
+
+    public static BaseItem getBaseItem(Item item){
+        if(Weapon.isWeapon(item)){
+            return Weapon.getInstance(item);
+        }
+        if(Armor.isArmor(item)){
+            return Armor.getInstance(item);
+        }
+        if(GemStone.isGemStone(item)){
+            return GemStone.getInstance(item);
+        }
+        return null;
+    }
+
+    public boolean isArmor(){
+        return false;
+    }
+
+    public boolean isWeapon(){
+        return false;
+    }
+
+    public boolean isGemStone(){
+        return false;
+    }
     private static LinkedHashMap<Integer, String> getChatMessageAll() {
         HashMap map = (HashMap) AwakenSystem.getMain().getConfig().get(baseAPI.ConfigType.SETTING.getName());
         int count = 0;
@@ -308,6 +405,5 @@ public abstract class BaseItem implements Cloneable{
         }
         return m;
     }
-
 
 }

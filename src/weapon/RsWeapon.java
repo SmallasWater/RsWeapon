@@ -2,16 +2,14 @@ package weapon;
 
 import AwakenSystem.data.baseAPI;
 import AwakenSystem.data.defaultAPI;
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
 import updata.AutoData;
 import weapon.commands.*;
-import weapon.items.Armor;
-import weapon.items.GemStone;
-import weapon.items.ItemLevel;
-import weapon.items.Weapon;
+import weapon.items.*;
 import weapon.players.OnListener;
 import weapon.players.effects.PlayerEffects;
 import weapon.task.FixPlayerInventoryTask;
@@ -45,6 +43,8 @@ public class RsWeapon extends PluginBase {
     public static LinkedHashMap<String, PlayerEffects> damages = new LinkedHashMap<>();
 
     public static LinkedList<ItemLevel> levels = new LinkedList<>();
+
+    public LinkedHashMap<Player, BaseItem> master = new LinkedHashMap<>();
 
     public static LinkedHashMap<String,Integer> playerHealth = new LinkedHashMap<>();
 
@@ -100,6 +100,7 @@ public class RsWeapon extends PluginBase {
         long t1 = System.currentTimeMillis();
         this.getLogger().info("开始加载宝石..");
         loadGemStone();
+
         this.getLogger().info("宝石加载完成..");
         this.getLogger().info("开始加载武器..");
         loadWeapon();
@@ -111,6 +112,7 @@ public class RsWeapon extends PluginBase {
         this.getServer().getScheduler().scheduleRepeatingTask(new ForeachPlayersTask(),20);
         this.getServer().getScheduler().scheduleRepeatingTask(new FixPlayerInventoryTask(),20);
         this.getServer().getCommandMap().register("",new ClickCommand("click"));
+        this.getServer().getCommandMap().register("",new MasterCommand("ms"));
         this.getServer().getCommandMap().register("",new WeCommand("we"));
         this.getServer().getCommandMap().register("",new ReloadCommand("up"));
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
@@ -206,7 +208,6 @@ public class RsWeapon extends PluginBase {
             }
         }
     }
-
     public int getUpDataLevel(){
         return getConfig().getInt("强化等级限制",12);
     }

@@ -22,10 +22,6 @@ public class Armor extends BaseItem{
 
     private static String tagName = "RsWeapon_Armor";
 
-    private String type;
-
-    private String name;
-
     private int armor;
 
     private BlockColor rgb;
@@ -34,8 +30,6 @@ public class Armor extends BaseItem{
      * 限制职业(属性): ""
      * 限制评级: 0
      * */
-
-    private String message;
 
     private int rpgLevel;
 
@@ -73,9 +67,6 @@ public class Armor extends BaseItem{
         this.toDamage = toDamage;
     }
 
-    public String getType() {
-        return type;
-    }
 
 
 
@@ -100,6 +91,7 @@ public class Armor extends BaseItem{
         return null;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -147,7 +139,11 @@ public class Armor extends BaseItem{
         if(tag == null){
             tag = new CompoundTag();
         }
-        return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
+        tag = super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
+        if(master != null){
+            tag.putString(tagName+"master",master);
+        }
+        return tag;
     }
 
     @Override
@@ -165,6 +161,7 @@ public class Armor extends BaseItem{
         Armor armor = Armor.getInstance(this.name);
         if(armor != null) {
             this.level = armor.level;
+            this.money = armor.money;
             this.dKick = armor.dKick;
             this.armor = armor.armor;
             this.health = armor.health;
@@ -183,6 +180,9 @@ public class Armor extends BaseItem{
                 this.dKick += stone.getDKick();
                 this.toDamage += stone.getToDamage();
             }
+            if(tag.contains(tagName+"master")){
+                this.master = tag.getString(tagName+"master");
+            }
             if (tag.contains(tagName + "upData")) {
                 for (int level = 0; level < tag.getInt(tagName + "upData"); level++) {
                     int add = RsWeapon.getInstance().getUpDataAttribute();
@@ -199,9 +199,15 @@ public class Armor extends BaseItem{
 
 
 
+    @Override
     public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
+        if(master != null){
+            lore.add("§r§6◈§a§l主人: §e"+master);
+        }else{
+            lore.add("§r§6◈§c§l未绑定");
+        }
         lore.add("§r§6◈类型   ◈§e盔甲");
         lore.add("§r§6◈耐久   ◈"+(unBreak?"§7无限耐久":"§c会损坏"));
         lore.add("§r§6◈品阶   ◈"+RsWeapon.levels.get(level).getName());
@@ -244,6 +250,10 @@ public class Armor extends BaseItem{
     }
 
 
+    @Override
+    public String getType() {
+        return type;
+    }
 
     private void setRGB(int r, int g, int b){
         rgb = new BlockColor(r,g,b);
@@ -252,6 +262,9 @@ public class Armor extends BaseItem{
 
 
     public static boolean isArmor(Item item){
+        if(item == null){
+            return false;
+        }
         if(item.hasCompoundTag()){
             CompoundTag tag = item.getNamedTag();
             if(tag.contains(BaseItem.TAG_NAME)){
@@ -281,6 +294,14 @@ public class Armor extends BaseItem{
         return null;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Armor){
+            return ((Armor) obj).getName().equals(name) && ((Armor) obj).type.equals(type);
+        }
+        return false;
+    }
+
 
     public LinkedList<GemStone> getGemStones() {
         return gemStoneLinkedList;
@@ -292,14 +313,25 @@ public class Armor extends BaseItem{
         String type = config.getString("类型");
         Item item = BaseItem.toItemByMap(id);
         int armor = config.getInt("护甲值");
+        int money = config.getInt("绑定花费",100);
         int health = config.getInt("增加血量");
         int toDamage = config.getInt("反伤");
         double dKick = config.getDouble("抗击退");
         int level = config.getInt("盔甲品阶");
-        List<Map> enchant = config.getMapList("盔甲附魔");
-        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
-        for (Enchantment aura : enchants){
-            item.addEnchantment(aura);
+        Object enchantObject = config.get("盔甲附魔");
+        if(enchantObject instanceof Map){
+            int enchantId = (int) ((Map)enchantObject).get("id");
+            int enchantLevel = (int) ((Map)enchantObject).get("level");
+            if(enchantLevel > 0){
+                Enchantment aura = Enchantment.getEnchantment(enchantId).setLevel(enchantLevel);
+                item.addEnchantment(aura);
+            }
+        }else if(enchantObject instanceof List){
+            List<Map> enchant = config.getMapList("盔甲附魔");
+            ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+            for (Enchantment aura : enchants){
+                item.addEnchantment(aura);
+            }
         }
         Map rgb = (Map) config.get("盔甲染色");
         int r = (int) rgb.get("r");
@@ -319,7 +351,18 @@ public class Armor extends BaseItem{
         armor1.setMessage(message);
         armor1.setType(type);
         armor1.setName(name);
+        armor1.setMoney(money);
         return armor1;
+    }
+
+    @Override
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    @Override
+    public int getMoney() {
+        return money;
     }
 
     private void setRpgAttribute(String rpgAttribute) {
@@ -342,30 +385,35 @@ public class Armor extends BaseItem{
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
 
-    public void inlayStone(GemStone stone){
+    @Override
+    public boolean inlayStone(GemStone stone){
         if(canInlay(stone)){
             gemStoneLinkedList.add(stone);
         }
+        return false;
     }
 
 
-    public void removeStone(GemStone stone){
+    @Override
+    public boolean removeStone(GemStone stone){
         if(canRemove(stone)){
             gemStoneLinkedList.remove(stone);
+            return true;
         }
+        return false;
     }
 
+    @Override
     public boolean canInlay(GemStone stone){
-        if(exit(stone.getxItem(),getType())){
-            if(gemStoneLinkedList.contains(stone)){
-                return false;
-            }else{
-                if(level >= stone.getxLevel()){
-                    return count >= (gemStoneLinkedList.size()+1);
+        if(stone != null){
+            if(exit(stone.getxItem(),getType())){
+                if(gemStoneLinkedList.contains(stone)){
+                    return false;
+                }else{
+                    if(level >= stone.getxLevel()){
+                        return count >= (gemStoneLinkedList.size()+1);
+                    }
                 }
             }
         }
@@ -374,9 +422,9 @@ public class Armor extends BaseItem{
 
 
 
+    @Override
     public boolean canRemove(GemStone stone){
         return gemStoneLinkedList.contains(stone);
-
     }
 
     @Override
@@ -388,6 +436,7 @@ public class Armor extends BaseItem{
         return false;
     }
 
+    @Override
     public boolean upData(Player player){
         int money = (int) EconomyAPI.getInstance().myMoney(player);
         if(money < RsWeapon.getInstance().getUpDataMoney()){
@@ -411,12 +460,35 @@ public class Armor extends BaseItem{
         return false;
     }
 
+    @Override
+    public boolean isArmor() {
+        return true;
+    }
+
+    @Override
+    public boolean canSetMaster() {
+        return true;
+    }
+
+    @Override
+    public String getMaster() {
+        return master;
+    }
+
+    @Override
+    public boolean setMaster(String master) {
+        this.master = master;
+        return true;
+    }
+
+
     private void setType(String type) {
         this.type = type;
     }
 
 
-    public boolean canUseArmor(Player player){
-        return canUse(player,rpgLevel,rpgAttribute,rpgPF);
+    @Override
+    public boolean canUse(Player player){
+        return canUse(player,rpgLevel,rpgAttribute,rpgPF) && (master == null || player.getName().equals(master));
     }
 }

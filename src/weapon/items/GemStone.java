@@ -29,9 +29,7 @@ public class GemStone extends BaseItem{
 
     public static final  String ARMOR = "盔甲";
 
-    private String name;
 
-    private String message;
 
     private int xLevel;
 
@@ -41,13 +39,13 @@ public class GemStone extends BaseItem{
 
     private int max;
 
-    private String type;
-
     private int armor;
 
     private double kick;
 
     private int health;
+
+    private int cg;
 
     private int level;
 
@@ -77,13 +75,23 @@ public class GemStone extends BaseItem{
 
     }
 
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    public void setCg(int cg) {
+        this.cg = cg;
+    }
+
+    public int getCg() {
+        return cg;
+    }
+
     private void setType(String type) {
         this.type = type;
     }
 
-    public String getType() {
-        return type;
-    }
 
     private GemStone(String name){
         this.name = name;
@@ -110,6 +118,7 @@ public class GemStone extends BaseItem{
         int xLevel = (int) x.get("品阶");
         LinkedList<String> xItem = GemStone.lists((List) x.get("装备"));
         double kick = config.getDouble("增加抗击退");
+
         int health = config.getInt("增加血量");
         LinkedList<BaseEffect> effects = new LinkedList<>();
         LinkedList<BaseEffect> damageEffect = new LinkedList<>();
@@ -166,13 +175,25 @@ public class GemStone extends BaseItem{
             }
         }
         int level = config.getInt("宝石品阶");
-        List<Map> enchant = config.getMapList("宝石附魔");
-        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
-        for (Enchantment aura : enchants){
-            item.addEnchantment(aura);
+        Object enchantObject = config.get("宝石附魔");
+        if(enchantObject instanceof Map){
+            int enchantId = (int) ((Map)enchantObject).get("id");
+            int enchantLevel = (int) ((Map)enchantObject).get("level");
+            if(enchantLevel > 0){
+                Enchantment aura = Enchantment.getEnchantment(enchantId).setLevel(enchantLevel);
+                item.addEnchantment(aura);
+            }
+        }else if(enchantObject instanceof List){
+            List<Map> enchant = config.getMapList("宝石附魔");
+            ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+            for (Enchantment aura : enchants){
+                item.addEnchantment(aura);
+            }
         }
+
         GemStone stone = new GemStone(item,level,xLevel,xItem,min,max,toDamage,armor,dKick ,kick,health,effects,damageEffect);
         stone.setMessage(message);
+        stone.setCg(config.getInt("镶嵌成功率",100));
         stone.setType(type);
         stone.setName(name);
         return stone;
@@ -184,10 +205,6 @@ public class GemStone extends BaseItem{
 
     private void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     private static LinkedList<String> lists(List list){
@@ -308,12 +325,19 @@ public class GemStone extends BaseItem{
         return item;
     }
 
+    @Override
+    public boolean isGemStone() {
+        return true;
+    }
+
+    @Override
     public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈§f宝石品阶     §6◈"+RsWeapon.levels.get(level).getName());
         lore.add("§r§6◈§f可镶嵌       §6◈"+(xItem.size() > 0?xItem:"§c不可镶嵌"));
         lore.add("§r§6◈§f限制品阶     §6◈"+RsWeapon.levels.get(xLevel).getName());
+        lore.add("§r§6◈§d成功率       §6◈"+cg+"％");
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r"+message.trim());
         lore.add("§r§f═§7╞════════════╡§f═");
@@ -361,6 +385,7 @@ public class GemStone extends BaseItem{
         return min;
     }
 
+    @Override
     public String getName() {
         return name;
     }

@@ -6,8 +6,8 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
-import weapon.items.Armor;
-import weapon.items.Weapon;
+import weapon.items.BaseItem;
+
 
 public class UpDataCommand extends Command {
 
@@ -20,26 +20,17 @@ public class UpDataCommand extends Command {
     public boolean execute(CommandSender commandSender, String s, String[] strings) {
         if(commandSender instanceof Player){
             Item item = ((Player) commandSender).getInventory().getItemInHand();
-            if(Weapon.isWeapon(item)){
-                Weapon weapon = Weapon.getInstance(item);
-                if(weapon != null){
-                    if(weapon.upData((Player) commandSender)){
-                        ((Player) commandSender).getInventory().removeItem(item);
-                        ((Player) commandSender).getInventory().addItem(weapon.toItem());
-                    }
-                }
-            }else if(Armor.isArmor(item)){
-                Armor armor = Armor.getInstance(item);
-                if(armor.upData((Player) commandSender)){
+            BaseItem item1 = BaseItem.getBaseItem(item);
+            if(item1 != null){
+                if(item1.upData((Player) commandSender)){
                     ((Player) commandSender).getInventory().removeItem(item);
-                    ((Player) commandSender).getInventory().addItem(armor.toItem());
+                    ((Player) commandSender).getInventory().addItem(item1.toItem());
+                    return true;
                 }
-            }else{
-                commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                commandSender.sendMessage("§r§c请手持 武器 或 盔甲");
-                commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }
-
+            commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+            commandSender.sendMessage("§r§c请手持 武器 或 盔甲");
+            commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
         }
         return true;
     }

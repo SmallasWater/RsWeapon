@@ -5,9 +5,8 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.item.Item;
-import weapon.items.Armor;
-import weapon.items.GemStone;
-import weapon.items.Weapon;
+import weapon.items.BaseItem;
+
 
 public class ShowMessageCommand extends Command {
     public ShowMessageCommand(String name) {
@@ -20,24 +19,10 @@ public class ShowMessageCommand extends Command {
             Item item = ((Player)commandSender).getInventory().getItemInHand();
             String type = null;
             String[] showList = null;
-            if(GemStone.isGemStone(item)){
-                GemStone wm = GemStone.getInstance(item);
-                if(wm != null){
-                    type = "宝石";
-                    showList = wm.lore();
-                }
-            }else if(Armor.isArmor(item)){
-                Armor armor = Armor.getInstance(item);
-                if(armor != null){
-                    type = "盔甲";
-                    showList = armor.lore();
-                }
-            }else if(Weapon.isWeapon(item)){
-                Weapon weapon = Weapon.getInstance(item);
-                if(weapon != null){
-                    type = "武器";
-                    showList = weapon.lore();
-                }
+            BaseItem item1 = BaseItem.getBaseItem(item);
+            if(item1 != null){
+                type = (item1.isGemStone()?"宝石":item1.isArmor()?"盔甲":"武器");
+                showList = item1.lore();
             }
             if(showList != null){
                 FormWindowSimple simple = new FormWindowSimple(type+"显示","");
@@ -50,9 +35,7 @@ public class ShowMessageCommand extends Command {
             }else{
                 commandSender.sendMessage("不是RsWeapon 系列物品 无法显示");
             }
-
         }
-
         return true;
     }
 }

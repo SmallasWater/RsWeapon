@@ -5,16 +5,15 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemColorArmor;
+import cn.nukkit.level.Sound;
 import weapon.events.PlayerClickGemStoneEvent;
 import weapon.events.PlayerRemoveGemStoneEvent;
-import weapon.items.Armor;
 import weapon.items.BaseItem;
 import weapon.items.GemStone;
-import weapon.items.Weapon;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 
 public class ClickCommand extends Command {
@@ -30,6 +29,7 @@ public class ClickCommand extends Command {
                 return false;
             }
             List<String> args = Arrays.asList(strings);
+            Item itemHand = ((Player) commandSender).getInventory().getItemInHand();
             switch (args.get(0)){
                 case "help":
                     commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -42,14 +42,9 @@ public class ClickCommand extends Command {
                         commandSender.sendMessage("§c指令错误，请输入/click help 查看");
                         return false;
                     }
-                    Item itemHand = ((Player) commandSender).getInventory().getItemInHand();
-                    if(Weapon.isWeapon(itemHand)){
-                        Weapon weapon = Weapon.getInstance(itemHand);
-                        inviteStone((Player) commandSender,args.get(1),weapon);
-
-                    }else if(Armor.isArmor(itemHand)){
-                        Armor armor = Armor.getInstance(itemHand);
-                        inviteStone((Player) commandSender,args.get(1),armor);
+                    BaseItem item = BaseItem.getBaseItem(itemHand);
+                    if(item != null){
+                        inviteStone((Player) commandSender,args.get(1),item);
                     }
                     break;
                 case "remove":
@@ -57,14 +52,9 @@ public class ClickCommand extends Command {
                         commandSender.sendMessage("§c指令错误，请输入/click help 查看");
                         return false;
                     }
-                    Item itemHand1 = ((Player) commandSender).getInventory().getItemInHand();
-                    if(Weapon.isWeapon(itemHand1)){
-                        Weapon weapon = Weapon.getInstance(itemHand1);
-                        removeStone((Player) commandSender,args.get(1),weapon);
-
-                    }else if(Armor.isArmor(itemHand1)){
-                        Armor armor = Armor.getInstance(itemHand1);
-                        removeStone((Player) commandSender,args.get(1),armor);
+                    item = BaseItem.getBaseItem(itemHand);
+                    if(item != null && !item.isGemStone()){
+                        removeStone((Player) commandSender,args.get(1),item);
                     }else{
                         commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                         commandSender.sendMessage("§r§e[镶嵌系统]§c请手持武器 或 盔甲");
@@ -115,97 +105,70 @@ public class ClickCommand extends Command {
     private void inviteStone(Player sender, String stoneName, BaseItem item){
         if(canRemoveItem(sender,stoneName)){
             GemStone stone = GemStone.getInstance(stoneName);
-            if(item != null){
-                if(stone != null){
-                    if(item instanceof Weapon){
-                        if(((Weapon) item).canInlay(stone)) {
-                            ((Weapon) item).inlayStone(stone);
-                            sender.getInventory().setItemInHand(item.toItem());
-                            toRemoveStone(stone,sender);
-                            PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender,stone,item);
-                            Server.getInstance().getPluginManager().callEvent(events);
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                            sender.sendMessage("§r§e[镶嵌系统]§e恭喜   宝石镶嵌成功  ");
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        }else{
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                            sender.sendMessage("§r§e[镶嵌系统]§c宝石无法镶嵌");
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        }
-                    }else if(item instanceof Armor){
-                        if(((Armor) item).canInlay(stone)) {
-                            ((Armor) item).inlayStone(stone);
-                            Item armor = item.toItem();
-                            if(armor instanceof ItemColorArmor){
-                                ((ItemColorArmor) armor).setColor(((Armor) item).getRgb());
-                            }
-                            sender.getInventory().setItemInHand(armor);
-                            toRemoveStone(stone,sender);
-                            PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender,stone,item);
-                            Server.getInstance().getPluginManager().callEvent(events);
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                            sender.sendMessage("§r§e[镶嵌系统]§e恭喜   宝石镶嵌成功  ");
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        }else{
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                            sender.sendMessage("§r§e[镶嵌系统]§c宝石无法镶嵌");
-                            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        }
-                    }else{
+            if(item != null && !item.isGemStone()){
+                if(stone != null) {
+                    if (!item.canUse(sender)) {
                         sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        sender.sendMessage("§r§e[镶嵌系统]§c请手持武器 或 盔甲");
+                        sender.sendMessage("§r§e[镶嵌系统]§c此武器无法镶嵌宝石");
                         sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                     }
-                }else{
-                    sender.sendMessage("§c此宝石无法使用");
+                    if (item.canInlay(stone)) {
+                        if (new Random().nextInt(100) <= stone.getCg()) {
+                            if (item.inlayStone(stone)) {
+                                sender.getInventory().setItemInHand(item.toItem());
+                                PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender, stone, item);
+                                Server.getInstance().getPluginManager().callEvent(events);
+                                sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                                sender.sendMessage("§r§e[镶嵌系统]§e恭喜   宝石镶嵌成功  ");
+                                sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                                return;
+                            }
+                        }
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        sender.sendMessage("§r§e[镶嵌系统]§c 宝石镶嵌失败，， 宝石破碎");
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        sender.getLevel().addSound(sender, Sound.LEASHKNOT_BREAK);
+                        toRemoveStone(stone, sender);
+                    } else {
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        sender.sendMessage("§r§e[镶嵌系统]§c宝石无法镶嵌");
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                    }
+                }else {
+                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                    sender.sendMessage("§r§e[镶嵌系统]§c抱歉，你背包并没有"+stoneName+"这个宝石 ");
+                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 }
 
-            }else {
-                sender.sendMessage("§c请手持武器或盔甲！");
+            }else{
+                sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                sender.sendMessage("§r§e[镶嵌系统]§c请手持 武器 或者 盔甲");
+                sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }
-
-        }else{
-            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-            sender.sendMessage("§r§e[镶嵌系统]§c抱歉，你背包并没有"+stoneName+"这个宝石 ");
-            sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
         }
     }
 
     private void removeStone(Player sender, String stoneName, BaseItem item){
         GemStone stone = GemStone.getInstance(stoneName);
         if(stone != null){
-            if(item instanceof Weapon){
-                if(((Weapon) item).canRemove(stone)){
-                    ((Weapon) item).removeStone(stone);
-                    sender.getInventory().setItemInHand(item.toItem());
-                    sender.getInventory().addItem(stone.toItem());
-                    PlayerRemoveGemStoneEvent events = new PlayerRemoveGemStoneEvent(sender,stone,item);
-                    Server.getInstance().getPluginManager().callEvent(events);
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                    sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除成功");
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                }else{
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                    sender.sendMessage("§r§e[镶嵌系统]§c抱歉，你武器没有 "+stoneName+"这个宝石");
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                }
-            }else if(item instanceof Armor){
-                if(((Armor) item).canRemove(stone)){
-                    ((Armor) item).removeStone(stone);
-                    Item armor = item.toItem();
-                    if(armor instanceof ItemColorArmor){
-                        ((ItemColorArmor) armor).setColor(((Armor) item).getRgb());
+            if(item != null &&!item.isGemStone()){
+                if(item.canRemove(stone)){
+                    if(item.removeStone(stone)){
+                        sender.getInventory().setItemInHand(item.toItem());
+                        sender.getInventory().addItem(stone.toItem());
+                        PlayerRemoveGemStoneEvent events = new PlayerRemoveGemStoneEvent(sender,stone,item);
+                        Server.getInstance().getPluginManager().callEvent(events);
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除成功");
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                    }else{
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除失败");
+                        sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                     }
-                    sender.getInventory().setItemInHand(armor);
-                    sender.getInventory().addItem(stone.toItem());
-                    PlayerRemoveGemStoneEvent events = new PlayerRemoveGemStoneEvent(sender,stone,item);
-                    Server.getInstance().getPluginManager().callEvent(events);
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                    sender.sendMessage("§r§e[镶嵌系统]§a宝石拆除成功");
-                    sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 }else{
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                    sender.sendMessage("§r§e[镶嵌系统]§c抱歉，你盔甲没有 "+stoneName+"这个宝石");
+                    sender.sendMessage("§r§e[镶嵌系统]§c抱歉，此装备没有"+stoneName+"这个宝石");
                     sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 }
             }else{

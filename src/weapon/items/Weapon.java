@@ -17,8 +17,6 @@ public class Weapon extends BaseItem {
 
     private int level;
 
-    private String name;
-
     private int min;
 
     private int max;
@@ -29,6 +27,8 @@ public class Weapon extends BaseItem {
 
     private int rpgPF;
 
+    private int money;
+
     private String type;
 
     private double kick;
@@ -36,8 +36,6 @@ public class Weapon extends BaseItem {
     private int count;
 
     private String deathMessage;
-
-    private String message;
 
     private boolean unBreak;
 
@@ -52,7 +50,23 @@ public class Weapon extends BaseItem {
         this.init();
     }
 
-    private Weapon(Item item, int min, int max, double kick, int level,int count,boolean unBreak,String deathMessage){
+    @Override
+    public boolean setMaster(String master) {
+        this.master = master;
+        return true;
+    }
+
+    @Override
+    public boolean canSetMaster() {
+        return true;
+    }
+
+    @Override
+    public String getMaster() {
+        return master;
+    }
+
+    private Weapon(Item item, int min, int max, double kick, int level, int count, boolean unBreak, String deathMessage){
         this.item = item;
         this.min = min;
         this.max = max;
@@ -63,6 +77,10 @@ public class Weapon extends BaseItem {
         this.deathMessage = deathMessage;
     }
 
+    @Override
+    public boolean isWeapon() {
+        return true;
+    }
 
     public static Weapon getInstance(String name) {
         if(Weapon.inArray(name)){
@@ -73,6 +91,8 @@ public class Weapon extends BaseItem {
         }
         return null;
     }
+
+
 
     public static String getWeaponName(Item item){
         if(Weapon.isWeapon(item)){
@@ -121,10 +141,6 @@ public class Weapon extends BaseItem {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     private static Weapon toWeapon(String name){
         Config config = new Config(RsWeapon.getInstance().getWeaponFile()+"/"+name+".yml");
         String id = config.getString("武器外形");
@@ -135,15 +151,26 @@ public class Weapon extends BaseItem {
         if(damages.containsKey("min")){
             min = (int) damages.get("min");
         }
+        int money = config.getInt("绑定花费",100);
         if(damages.containsKey("max")){
             max = (int) damages.get("max");
         }
         double kick = config.getDouble("武器击退");
         int level = config.getInt("武器品阶");
-        List<Map> enchant = config.getMapList("武器附魔");
-        ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
-        for (Enchantment aura : enchants){
-            item.addEnchantment(aura);
+        Object enchantObject = config.get("武器附魔");
+        if(enchantObject instanceof Map){
+            int enchantId = (int) ((Map)enchantObject).get("id");
+            int enchantLevel = (int) ((Map)enchantObject).get("level");
+            if(enchantLevel > 0){
+                Enchantment aura = Enchantment.getEnchantment(enchantId).setLevel(enchantLevel);
+                item.addEnchantment(aura);
+            }
+        }else if(enchantObject instanceof List){
+            List<Map> enchant = config.getMapList("武器附魔");
+            ArrayList<Enchantment> enchants = BaseItem.getEnchant(enchant);
+            for (Enchantment aura : enchants){
+                item.addEnchantment(aura);
+            }
         }
         int count = config.getInt("镶嵌数量");
 
@@ -160,7 +187,18 @@ public class Weapon extends BaseItem {
         weapon.setMessage(config.getString("介绍"));
         weapon.setType(type);
         weapon.setName(name);
+        weapon.setMoney(money);
         return weapon;
+    }
+
+    @Override
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    @Override
+    public int getMoney() {
+        return money;
     }
 
     private void setRpgPF(int rpgPF) {
@@ -180,9 +218,6 @@ public class Weapon extends BaseItem {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
-    }
 
     private void setType(String type) {
         this.type = type;
@@ -196,12 +231,24 @@ public class Weapon extends BaseItem {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Weapon){
+            return ((Weapon) obj).getName().equals(name) && ((Weapon) obj).type.equals(type);
+        }
+        return false;
+    }
+
+    @Override
     public CompoundTag getCompoundTag(){
         CompoundTag tag = item.getNamedTag();
         if(tag == null){
             tag = new CompoundTag();
         }
-        return super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
+        tag = super.getCompoundTag(tag,unBreak,name,tagName,gemStoneLinkedList);
+        if(master != null){
+            tag.putString(tagName+"master",master);
+        }
+        return tag;
     }
 
     @Override
@@ -225,12 +272,19 @@ public class Weapon extends BaseItem {
     }
 
 
+    @Override
     public String[] lore(){//13
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§r§f═§7╞════════════╡§f═");
+        if(master != null){
+            lore.add("§r§6◈§a§l主人: §e"+master);
+        }else{
+            lore.add("§r§6◈§c§l未绑定");
+        }
         lore.add("§r§6◈类型   §6◈§a武器");
         lore.add("§r§6◈耐久   §6◈"+(unBreak?"§7无限耐久":(item.getMaxDurability() != -1?"§c会损坏":"§a无耐久")));
         lore.add("§r§6◈品阶   §6◈"+RsWeapon.levels.get(level).getName());
+
         lore.addAll(getListByRPG(rpgLevel,rpgAttribute,rpgPF,message.trim())) ;
         lore.add("§r§6◈§7攻击§6◈ §a"+min+" - "+max);
         lore.add("§r§6◈§7击退§6◈ §a"+(Double.parseDouble(
@@ -243,6 +297,7 @@ public class Weapon extends BaseItem {
         return lore.toArray(new String[0]);
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
@@ -259,6 +314,7 @@ public class Weapon extends BaseItem {
     private void reload(CompoundTag tag){
         Weapon weapon = Weapon.getInstance(name);
         if(weapon != null){
+            this.money = weapon.money;
             this.level = weapon.level;
             this.kick = weapon.kick;
             this.min = weapon.min;
@@ -278,11 +334,18 @@ public class Weapon extends BaseItem {
                     this.max += stone.getMax();
                 }
             }
+            if(tag.contains(tagName+"master")){
+                this.master = tag.getString(tagName+"master");
+            }
             if(tag.contains(tagName+"upData")){
                 for(int level = 1;level <= tag.getInt(tagName+"upData");level++){
                     int add =  RsWeapon.getInstance().getUpDataAttribute();
                     if(add > 0){
-                        this.kick += ((float) add / 10);
+                        if(this.kick >= 1.5){
+                            this.kick = 1.5;
+                        }else{
+                            this.kick += ((float) add / 10);
+                        }
                         this.min += add;
                         this.max += add;
                     }
@@ -308,6 +371,9 @@ public class Weapon extends BaseItem {
     }
 
     public static boolean isWeapon(Item item){
+        if(item == null){
+            return false;
+        }
         if(item.hasCompoundTag()){
             CompoundTag tag = item.getNamedTag();
             if(tag.contains(BaseItem.TAG_NAME)){
@@ -341,36 +407,52 @@ public class Weapon extends BaseItem {
     }
 
 
-    public void inlayStone(GemStone stone){
+    @Override
+    public boolean inlayStone(GemStone stone){
         if(canInlay(stone)){
             gemStoneLinkedList.add(stone);
+            return true;
         }
+        return false;
     }
 
 
-    public void removeStone(GemStone stone){
+    @Override
+    public boolean removeStone(GemStone stone){
         if(canRemove(stone)){
             gemStoneLinkedList.remove(stone);
+            return true;
         }
+        return false;
     }
 
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
     public boolean canInlay(GemStone stone){
-        if(exit(stone.getxItem(),getType())){
-            if(gemStoneLinkedList.contains(stone)){
-                return false;
-            }else{
-                if(level >= stone.getxLevel()){
-                    return count >= (gemStoneLinkedList.size()+1);
+        if(stone != null){
+            if(exit(stone.getxItem(),getType())){
+                if(gemStoneLinkedList.contains(stone)){
+                    return false;
+                }else{
+                    if(level >= stone.getxLevel()){
+                        return count >= (gemStoneLinkedList.size()+1);
+                    }
                 }
             }
         }
         return false;
     }
 
+    @Override
     public boolean canRemove(GemStone stone){
         return gemStoneLinkedList.contains(stone);
     }
 
+    @Override
     public boolean upData(Player player){
         int money = (int) EconomyAPI.getInstance().myMoney(player);
         if(money < RsWeapon.getInstance().getUpDataMoney()){
@@ -394,8 +476,9 @@ public class Weapon extends BaseItem {
         return false;
     }
 
-    public boolean canUseWeapon(Player player){
-        return canUse(player,rpgLevel,rpgAttribute,rpgPF);
+    @Override
+    public boolean canUse(Player player){
+        return canUse(player,rpgLevel,rpgAttribute,rpgPF) && (master == null || player.getName().equals(master));
     }
 
     @Override
