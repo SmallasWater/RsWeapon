@@ -4,10 +4,12 @@ import AwakenSystem.data.baseAPI;
 import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
 import updata.AutoData;
+import weapon.floatingtext.TextEntity;
 import weapon.commands.*;
 import weapon.items.*;
 import weapon.players.OnListener;
@@ -118,6 +120,7 @@ public class RsWeapon extends PluginBase {
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
         this.getServer().getCommandMap().register("",new ShowMessageCommand("wm"));
         long t2 = System.currentTimeMillis();
+        Entity.registerEntity("TextEntity", TextEntity.class);
         this.getLogger().info("配置加载完成 用时:"+((t2 - t1) % (1000 * 60))+"ms");
         this.getLogger().info("武器系统加载成功..作者: 若水");
     }

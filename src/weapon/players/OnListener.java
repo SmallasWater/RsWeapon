@@ -13,11 +13,13 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBow;
+import cn.nukkit.item.ItemBowl;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.TextFormat;
 import weapon.RsWeapon;
-import weapon.items.Armor;
+import weapon.floatingtext.ShowHealthText;
 import weapon.items.BaseItem;
 import weapon.items.Weapon;
 import weapon.players.effects.BaseEffect;
@@ -35,6 +37,22 @@ import weapon.utils.Skill;
 import java.util.LinkedList;
 
 public class OnListener implements Listener {
+
+    private LinkedList<Player> bow = new LinkedList<>();
+
+    @EventHandler
+    public void onInt(PlayerInteractEvent event){
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+        if(BaseItem.getBaseItem(item) != null){
+            if(item instanceof ItemBow || item instanceof ItemBowl){
+                if(event.getAction() == PlayerInteractEvent.Action.PHYSICAL) {
+                    bow.add(player);
+                }
+
+            }
+        }
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
@@ -58,6 +76,10 @@ public class OnListener implements Listener {
             if(damagePlayer instanceof Player){
                 Item item = ((Player) damagePlayer).getInventory().getItemInHand();
                 if(Weapon.isWeapon(item)){
+                    if(bow.contains(damagePlayer)){
+                        bow.remove(damagePlayer);
+                        return;
+                    }
                     float damage = event.getDamage();
                     LinkedList<BaseEffect> damageEffects = PlayerAddAttributes.getDamages((Player) damagePlayer);
                     damage += PlayerAddAttributes.getDamage((Player) damagePlayer);
@@ -79,6 +101,7 @@ public class OnListener implements Listener {
 
         }
     }
+
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event){
@@ -151,12 +174,12 @@ public class OnListener implements Listener {
             if(damagePlayer == null || entity == null){
                 return;
             }
+            float damage = event.getFinalDamage();
             if(entity instanceof Player){
                 PlayerEffects playerEffects2 = PlayerEffects.getInstance(entity.getName());
                 LinkedList<BaseEffect> entityEffects = PlayerAddAttributes.getEffects((Player) entity);
                 int dDamage = PlayerAddAttributes.getArmor((Player) entity);
                 double dKick = PlayerAddAttributes.getDKick((Player) entity);
-                float damage = event.getFinalDamage();
                 float kick = ((EntityDamageByEntityEvent) event).getKnockBack();
                 damage = damage - dDamage;
                 kick = kick - (float) dKick;
@@ -198,7 +221,24 @@ public class OnListener implements Listener {
                 event.setDamage(damage);
                 ((EntityDamageByEntityEvent) event).setKnockBack(kick);
             }
+
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onShow(EntityDamageEvent event){
+        Entity entity = event.getEntity();
+        EntityDamageEvent.DamageCause cause = event.getCause();
+        if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
+        || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION){
+            if(entity instanceof Player){
+                ShowHealthText.send(event.getEntity(),"§l§o§e - §c"+event.getFinalDamage());
+            }else{
+                ShowHealthText.send(event.getEntity(),"§l§o§e - §a"+event.getFinalDamage());
+            }
+        }
+
     }
 
 

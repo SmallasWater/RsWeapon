@@ -116,6 +116,9 @@ public class ClickCommand extends Command {
                         if (new Random().nextInt(100) <= stone.getCg()) {
                             if (item.inlayStone(stone)) {
                                 sender.getInventory().setItemInHand(item.toItem());
+                                Item st = stone.toItem();
+                                st.setCount(1);
+                                sender.getInventory().removeItem(stone.toItem());
                                 PlayerClickGemStoneEvent events = new PlayerClickGemStoneEvent(sender, stone, item);
                                 Server.getInstance().getPluginManager().callEvent(events);
                                 sender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");

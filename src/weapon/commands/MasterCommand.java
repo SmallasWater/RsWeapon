@@ -10,7 +10,7 @@ import weapon.items.BaseItem;
 
 public class MasterCommand extends Command {
     public MasterCommand(String name) {
-        super(name,"武器装备认主指令","/ms",new String[]{"绑定","认主"});
+        super(name,"武器装备认主指令","/ms help",new String[]{"绑定","认主"});
     }
 
     @Override
@@ -49,7 +49,7 @@ public class MasterCommand extends Command {
                             if (item1.equals(item)) {
                                 if(EconomyAPI.getInstance().reduceMoney(commandSender.getName(),item.getMoney(),true) == 1){
                                     if(item1.setMaster(commandSender.getName())){
-                                        ((Player) commandSender).getInventory().setItemInHand(item.toItem());
+                                        ((Player) commandSender).getInventory().setItemInHand(item1.toItem());
                                         commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                                         commandSender.sendMessage("§r§a[认主系统]§b"+ (item.isWeapon() ? "武器" : "盔甲") +"认主成功! 拥有者:"+commandSender.getName());
                                         commandSender.sendMessage("§r§a[认主系统]§e花费: "+item.getMoney());
@@ -76,6 +76,12 @@ public class MasterCommand extends Command {
                 if("解绑".equals(strings[0])){
                     remove((Player) commandSender);
                     return true;
+                }
+                if("help".equals(strings[0])){
+                    commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                    commandSender.sendMessage("§r§a/绑定 绑定 绑定手中的武器或盔甲");
+                    commandSender.sendMessage("§r§a/绑定 解绑 解绑手中的武器或盔甲");
+                    commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 }
             }
         }

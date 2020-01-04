@@ -23,8 +23,7 @@ public class UpDataCommand extends Command {
             BaseItem item1 = BaseItem.getBaseItem(item);
             if(item1 != null){
                 if(item1.upData((Player) commandSender)){
-                    ((Player) commandSender).getInventory().removeItem(item);
-                    ((Player) commandSender).getInventory().addItem(item1.toItem());
+                    ((Player) commandSender).getInventory().setItemInHand(item1.toItem());
                     return true;
                 }
             }
