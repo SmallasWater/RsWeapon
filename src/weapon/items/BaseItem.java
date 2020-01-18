@@ -23,6 +23,9 @@ public abstract class BaseItem implements Cloneable{
 
     String type;
 
+    boolean canUp;
+    int levelUp = 0;
+
     int count,money;
     final static String TAG_NAME = "RsWeaponName";
     Item item;
@@ -69,6 +72,14 @@ public abstract class BaseItem implements Cloneable{
         return master != null;
     }
 
+    public void setLevelUp(int levelUp) {
+        this.levelUp = levelUp;
+    }
+
+
+    public int getLevelUp() {
+        return levelUp;
+    }
 
     static Item toItemByMap(String id){
         return Item.fromString(id);
@@ -89,6 +100,14 @@ public abstract class BaseItem implements Cloneable{
             }
         }
         return m;
+    }
+
+    public void setCanUp(boolean canUp) {
+        this.canUp = canUp;
+    }
+
+    public boolean isCanUp() {
+        return canUp;
     }
 
     public CompoundTag getCompoundTag(){
@@ -309,7 +328,7 @@ public abstract class BaseItem implements Cloneable{
         if(Server.getInstance().getPluginManager().getPlugin("LevelAwakenSystem") != null){
             lore.add("§r§f═§7╞════════════╡§f═");
             lore.add("§r§e◎§b限制等级§e◎  §f"+rpgLevel);
-            lore.add("§r§e◎§b限制评级§e◎  §f"+getChatMessageAll().get(rpgPF));
+            lore.add("§r§e◎§b限制评级§e◎  §f"+getChatMessageAll(rpgPF));
             lore.add("§r§e◎§b限制属性§e◎  §f"+("".equals(rpgAttribute)?"无":rpgAttribute));
         }
         return lore;
@@ -369,6 +388,9 @@ public abstract class BaseItem implements Cloneable{
         return true;
     }
 
+    public boolean toRarity(){
+        return false;
+    }
 
 
     public static BaseItem getBaseItem(Item item){
@@ -395,15 +417,21 @@ public abstract class BaseItem implements Cloneable{
     public boolean isGemStone(){
         return false;
     }
-    private static LinkedHashMap<Integer, String> getChatMessageAll() {
-        HashMap map = (HashMap) AwakenSystem.getMain().getConfig().get(baseAPI.ConfigType.SETTING.getName());
-        int count = 0;
-        LinkedHashMap<Integer, String> m = new LinkedHashMap<>();
-        for(Iterator var3 = map.keySet().iterator(); var3.hasNext(); ++count) {
-            Object string = var3.next();
-            m.put(count, String.valueOf(string));
+
+    private static String getChatMessageAll(int pf) {
+        try{
+            HashMap map = (HashMap) AwakenSystem.getMain().getConfig().get(baseAPI.ConfigType.SETTING.getName());
+            int count = 0;
+            LinkedHashMap<Integer, String> m = new LinkedHashMap<>();
+            for(Iterator var3 = map.keySet().iterator(); var3.hasNext(); ++count) {
+                Object string = var3.next();
+                m.put(count, String.valueOf(string));
+            }
+            return m.get(pf);
+        }catch (Exception e){
+            return "?";
         }
-        return m;
+
     }
 
 }

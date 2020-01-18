@@ -29,6 +29,8 @@ public class GemStone extends BaseItem{
 
     public static final  String ARMOR = "盔甲";
 
+    private boolean canShow = false;
+
 
 
     private int xLevel;
@@ -93,11 +95,19 @@ public class GemStone extends BaseItem{
     }
 
 
+    public void setCanShow(boolean canShow) {
+        this.canShow = canShow;
+    }
+
+    public boolean isCanShow() {
+        return canShow;
+    }
+
     private GemStone(String name){
         this.name = name;
     }
 
-    private static GemStone toGemStone(String name){
+    public static GemStone toGemStone(String name){
         Config config = new Config(RsWeapon.getInstance().getGemFile()+"/"+name+".yml");
         String id = config.getString("宝石外形");
         String type = config.getString("类型 ");
@@ -193,9 +203,24 @@ public class GemStone extends BaseItem{
 
         GemStone stone = new GemStone(item,level,xLevel,xItem,min,max,toDamage,armor,dKick ,kick,health,effects,damageEffect);
         stone.setMessage(message);
+        Object up = config.get("稀有度");
+        int levelUp = 0;
+        if(up != null){
+            if(up instanceof String){
+                if("x".equals(up.toString().toLowerCase())){
+                    levelUp = new Random().nextInt(RsWeapon.rarity.size());
+                    stone.setCanUp(true);
+                }
+            }else if(up instanceof Integer){
+                levelUp = (int) up;
+            }
+        }
+        stone.setLevelUp(levelUp);
         stone.setCg(config.getInt("镶嵌成功率",100));
         stone.setType(type);
         stone.setName(name);
+        stone.setLevelUp(config.getInt("稀有度",0));
+        stone.setCanShow(config.getBoolean("是否在创造背包显示",false));
         return stone;
     }
 
@@ -333,6 +358,7 @@ public class GemStone extends BaseItem{
     @Override
     public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
+        lore.add("§r§2稀有度:  §r"+RsWeapon.getInstance().getLevelUpByString(levelUp).getName());
         lore.add("§r§f═§7╞════════════╡§f═");
         lore.add("§r§6◈§f宝石品阶     §6◈"+RsWeapon.levels.get(level).getName());
         lore.add("§r§6◈§f可镶嵌       §6◈"+(xItem.size() > 0?xItem:"§c不可镶嵌"));

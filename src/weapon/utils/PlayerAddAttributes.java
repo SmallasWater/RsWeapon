@@ -50,13 +50,30 @@ public class PlayerAddAttributes {
         return health;
     }
 
+    public static int getNumberUp(Object r,int up){
+        if(r instanceof String){
+            String r1 = r.toString();
+            if(r1.matches("^([0-9.]+)[ ]*%$")) {
+                int a1 = Integer.parseInt(r1.split("%")[0]);
+                a1 /= 100;
+                if (a1 > 0) {
+                    return (up * a1);
+                }
+            }
+        }else if(r instanceof Integer){
+            return ((Integer)r);
+        }
+        return 0;
+
+    }
+
     public static int getDamage(Player player){
         LinkedList<BaseItem> items = getItems(player);
         int damage = 0;
         if(items.size() > 0){
             for (BaseItem item:items){
                 if(item instanceof Weapon){
-                    damage = new Random().nextInt(((Weapon) item).getMax()) + ((Weapon) item).getMin();
+                    damage = ((Weapon) item).getFinalDamage();
                 }
             }
         }

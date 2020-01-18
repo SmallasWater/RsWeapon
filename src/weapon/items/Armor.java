@@ -6,6 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Config;
 import me.onebone.economyapi.EconomyAPI;
@@ -13,16 +14,17 @@ import weapon.RsWeapon;
 import weapon.players.effects.BaseEffect;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Armor extends BaseItem{
 
     private static String tagName = "RsWeapon_Armor";
 
     private int armor;
+
+
+
+
 
     private BlockColor rgb;
     /**
@@ -34,6 +36,8 @@ public class Armor extends BaseItem{
     private int rpgLevel;
 
     private String rpgAttribute;
+
+    private boolean canShow = false;
 
     private int rpgPF;
 
@@ -89,6 +93,14 @@ public class Armor extends BaseItem{
             return new Armor(item);
         }
         return null;
+    }
+
+    public void setCanShow(boolean canShow) {
+        this.canShow = canShow;
+    }
+
+    public boolean isCanShow() {
+        return canShow;
     }
 
     @Override
@@ -168,7 +180,9 @@ public class Armor extends BaseItem{
             this.toDamage = armor.toDamage;
             this.count = armor.count;
             this.type = armor.type;
+            this.levelUp = armor.levelUp;
             this.message = armor.message;
+            this.canShow = armor.canShow;
             this.rgb = armor.rgb;
             this.unBreak = armor.unBreak;
             this.rpgPF = armor.rpgPF;
@@ -183,25 +197,42 @@ public class Armor extends BaseItem{
             if(tag.contains(tagName+"master")){
                 this.master = tag.getString(tagName+"master");
             }
+            if(tag.contains(tagName+"levelUp")){
+                int[] tag1 = tag.getIntArray(tagName+"levelUp");
+                int lup = tag1[0];
+                int aup = tag1[1];
+                int hup = tag1[2];
+                int tup = tag1[3];
+                this.armor += aup;
+                this.health += hup;
+                this.toDamage += tup;
+                this.levelUp = lup;
+            }
+            
             if (tag.contains(tagName + "upData")) {
                 for (int level = 0; level < tag.getInt(tagName + "upData"); level++) {
-                    int add = RsWeapon.getInstance().getUpDataAttribute();
-                    if (add > 0) {
-                        this.armor += add;
-                        this.health += add;
-                        this.dKick += ((float) add / 10);
-                        this.toDamage += add;
+                    int add1 = RsWeapon.getInstance().getUpDataAttribute(this.armor);
+                    int add2 = RsWeapon.getInstance().getUpDataAttribute(this.health);
+                    int add3 = RsWeapon.getInstance().getUpDataAttribute(this.toDamage);
+                    if (add1 > 0 && add2 > 0 && add3 > 0) {
+                        this.armor += add1;
+                        this.health += add2;
+                        this.toDamage += add2;
                     }
                 }
             }
         }
     }
 
+    
+    
 
+    
 
     @Override
     public String[] lore(){
         ArrayList<String> lore = new ArrayList<>();
+        lore.add("§r§2稀有度:  §r"+RsWeapon.getInstance().getLevelUpByString(levelUp).getName());
         lore.add("§r§f═§7╞════════════╡§f═");
         if(master != null){
             lore.add("§r§6◈§a§l主人: §e"+master);
@@ -274,6 +305,19 @@ public class Armor extends BaseItem{
         return false;
     }
 
+    @Override
+    public boolean toRarity() {
+        CompoundTag tag = item.getNamedTag();
+        int r = new Random().nextInt(RsWeapon.rarity.size());
+        Rarity rarity = RsWeapon.getInstance().getLevelUpByString(r);
+        tag.putIntArray(Armor.tagName+"levelUp",new int[]{r
+                ,rarity.getRound((armor))
+                ,rarity.getRound(health)
+                ,rarity.getRound(toDamage)});
+        item.setNamedTag(tag);
+        return true;
+    }
+
     public static Armor getInstance(String name){
         if(Armor.inArray(name)){
             if(!RsWeapon.CaCheArmor.containsKey(name)){
@@ -307,7 +351,7 @@ public class Armor extends BaseItem{
         return gemStoneLinkedList;
     }
 
-    private static Armor toArmor(String name){
+    public static Armor toArmor(String name){
         Config config = new Config(RsWeapon.getInstance().getArmorFile()+"/"+name+".yml");
         String id = config.getString("盔甲外形");
         String type = config.getString("类型");
@@ -347,11 +391,25 @@ public class Armor extends BaseItem{
         armor1.setRpgLevel(rpgLevel);
         armor1.setRpgPF(rpgPF);
         armor1.setRpgAttribute(rpgAttribute);
+        Object up = config.get("稀有度");
+        int levelUp = 0;
+        if(up != null){
+            if(up instanceof String){
+                if("x".equals(up.toString().toLowerCase())){
+                    levelUp = new Random().nextInt(RsWeapon.rarity.size());
+                    armor1.setCanUp(true);
+                }
+            }else if(up instanceof Integer){
+                levelUp = (int) up;
+            }
+        }
+        armor1.setLevelUp(levelUp);
         armor1.setRGB(r,g,b);
         armor1.setMessage(message);
         armor1.setType(type);
         armor1.setName(name);
         armor1.setMoney(money);
+        armor1.setCanShow(config.getBoolean("是否在创造背包显示",false));
         return armor1;
     }
 
@@ -439,7 +497,7 @@ public class Armor extends BaseItem{
     @Override
     public boolean upData(Player player){
         int money = (int) EconomyAPI.getInstance().myMoney(player);
-        if(money < RsWeapon.getInstance().getUpDataMoney()){
+        if(money < RsWeapon.getInstance().getUpDataMoney(levelUp)){
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             player.sendMessage("§r§c抱歉 您的金钱不足 无法强化");
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -449,7 +507,7 @@ public class Armor extends BaseItem{
                 player.sendMessage("§r§c抱歉 此盔甲无法强化");
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }else{
-                EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(),true);
+                EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(levelUp),true);
                 toUpData(tagName);
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§e恭喜 盔甲强化成功");

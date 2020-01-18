@@ -44,12 +44,13 @@ public class OnListener implements Listener {
     public void onInt(PlayerInteractEvent event){
         Player player = event.getPlayer();
         Item item = event.getItem();
-        if(BaseItem.getBaseItem(item) != null){
-            if(item instanceof ItemBow || item instanceof ItemBowl){
-                if(event.getAction() == PlayerInteractEvent.Action.PHYSICAL) {
-                    bow.add(player);
+        if(item != null){
+            if(BaseItem.getBaseItem(item) != null){
+                if(item instanceof ItemBow || item instanceof ItemBowl){
+                    if(event.getAction() == PlayerInteractEvent.Action.PHYSICAL) {
+                        bow.add(player);
+                    }
                 }
-
             }
         }
     }
@@ -61,6 +62,8 @@ public class OnListener implements Listener {
         Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddHealthTask(player),20);
         Server.getInstance().getScheduler().scheduleRepeatingTask(new PlayerAddEffectTask(player),20);
     }
+
+  
 
     @EventHandler
     public void onDamage(EntityDamageEvent event){
@@ -229,6 +232,9 @@ public class OnListener implements Listener {
     public void onShow(EntityDamageEvent event){
         Entity entity = event.getEntity();
         EntityDamageEvent.DamageCause cause = event.getCause();
+        if(event.isCancelled()){
+            return;
+        }
         if(cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                 || cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
         || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION){

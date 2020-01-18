@@ -40,7 +40,7 @@ public class WeCommand extends Command {
                         commandSender.sendMessage("§b/we give armor <盔甲名称> <Player> §a给玩家盔甲");
                         commandSender.sendMessage("§b/we addItem <宝石名称> <ID:Damage> §a添加宝石");
                         commandSender.sendMessage("§b/we giveItem <宝石名称> <Player> §a给玩家宝石");
-                        commandSender.sendMessage("§b/we reload§a重新加载");
+                        commandSender.sendMessage("§b/we reload §a重新加载");
                         commandSender.sendMessage("§7=================================");
                         break;
                     case "add":
@@ -82,6 +82,9 @@ public class WeCommand extends Command {
                                 }
                                 Armor armor = Armor.getInstance(name);
                                 if(armor != null){
+                                    if(armor.isCanUp()){
+                                        armor.toRarity();
+                                    }
                                     Item item = armor.toItem();
                                     if(item instanceof ItemColorArmor){
                                         ((ItemColorArmor) item).setColor(armor.getRgb());
@@ -99,6 +102,9 @@ public class WeCommand extends Command {
                                 }
                                 Weapon weapon = Weapon.getInstance(name);
                                 if(weapon != null){
+                                    if(weapon.isCanUp()){
+                                        weapon.toRarity();
+                                    }
                                     player.getInventory().addItem(weapon.toItem());
                                     commandSender.sendMessage(TextFormat.GREEN+"给予成功");
                                 }else{
@@ -112,6 +118,7 @@ public class WeCommand extends Command {
                     case "reload":
                         commandSender.sendMessage(TextFormat.GOLD+"重新加载武器盔甲中...");
                         RsWeapon.getInstance().loadSkill();
+                        RsWeapon.getInstance().loadRarity();
                         RsWeapon.GemStones = new LinkedHashMap<>();
                         RsWeapon.CaCheArmor = new LinkedHashMap<>();
                         RsWeapon.CaCheWeapon = new LinkedHashMap<>();

@@ -5,6 +5,7 @@ import AwakenSystem.data.defaultAPI;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.item.Item;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 
@@ -16,6 +17,7 @@ import weapon.players.OnListener;
 import weapon.players.effects.PlayerEffects;
 import weapon.task.FixPlayerInventoryTask;
 import weapon.task.ForeachPlayersTask;
+import weapon.utils.PlayerAddAttributes;
 import weapon.utils.RsWeaponSkill;
 import weapon.utils.Skill;
 
@@ -45,6 +47,8 @@ public class RsWeapon extends PluginBase {
     public static LinkedHashMap<String, PlayerEffects> damages = new LinkedHashMap<>();
 
     public static LinkedList<ItemLevel> levels = new LinkedList<>();
+
+    public static LinkedList<Rarity> rarity = new LinkedList<>();
 
     public LinkedHashMap<Player, BaseItem> master = new LinkedHashMap<>();
 
@@ -76,7 +80,7 @@ public class RsWeapon extends PluginBase {
         this.saveDefaultConfig();
         this.reloadConfig();
         levels = initLevel();
-
+        loadRarity();
         if(!gemFiles.exists()){
             if(!gemFiles.mkdirs()){
                 Server.getInstance().getLogger().info("/GemStone文件夹创建失败");
@@ -119,6 +123,7 @@ public class RsWeapon extends PluginBase {
         this.getServer().getCommandMap().register("",new ReloadCommand("up"));
         this.getServer().getCommandMap().register("",new UpDataCommand("ups"));
         this.getServer().getCommandMap().register("",new ShowMessageCommand("wm"));
+        this.getServer().getCommandMap().register("",new ClearCommand("cw"));
         long t2 = System.currentTimeMillis();
         Entity.registerEntity("TextEntity", TextEntity.class);
         this.getLogger().info("配置加载完成 用时:"+((t2 - t1) % (1000 * 60))+"ms");
@@ -156,7 +161,6 @@ public class RsWeapon extends PluginBase {
         return levels;
     }
 
-
     public void loadGemStone(){
         File file = new File(this.getDataFolder()+"/GemStone");
         File[] files = file.listFiles();
@@ -164,8 +168,15 @@ public class RsWeapon extends PluginBase {
             for(File file1:files){
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
-                    GemStones.put(names,GemStone.getInstance(names));
-
+                    GemStone stone = GemStone.toGemStone(names);
+                    if(stone != null){
+                        GemStones.put(names,stone);
+                        if(getCanShowInventory()){
+                            if (stone.isCanShow()) {
+                                Item.addCreativeItem(stone.toItem());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -193,7 +204,16 @@ public class RsWeapon extends PluginBase {
             for(File file1:files){
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
-                    CaCheWeapon.put(names,Weapon.getInstance(names));
+                    Weapon weapon = Weapon.toWeapon(names);
+                    if(weapon != null){
+                        CaCheWeapon.put(names,weapon);
+                        if(getCanShowInventory()){
+                            if (weapon.isCanShow()){
+                                Item.addCreativeItem(weapon.toItem());
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -206,7 +226,14 @@ public class RsWeapon extends PluginBase {
             for(File file1:files){
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
-                    CaCheArmor.put(names,Armor.getInstance(names));
+                    Armor armor = Armor.toArmor(names);
+                    CaCheArmor.put(names,armor);
+                    if(getCanShowInventory()){
+                        if(armor.isCanShow()) {
+                            Item.addCreativeItem(armor.toItem());
+                        }
+                    }
+
                 }
             }
         }
@@ -215,12 +242,16 @@ public class RsWeapon extends PluginBase {
         return getConfig().getInt("强化等级限制",12);
     }
 
-    public int getUpDataAttribute(){
-        return getConfig().getInt("强化增加属性",1);
+    public int getUpDataAttribute(int r){
+        return PlayerAddAttributes.getNumberUp(getConfig().get("强化增加属性",1),r);
     }
 
-    public int getUpDataMoney(){
-        return getConfig().getInt("强化消耗金币",5000);
+    public int getUpDataMoney(int level){
+        return getConfig().getInt("强化消耗金币",5000) * (level + 1);
+    }
+
+    private boolean getCanShowInventory(){
+        return getConfig().getBoolean("装备是否显示创造背包",true);
     }
 
     @Override
@@ -234,5 +265,28 @@ public class RsWeapon extends PluginBase {
 
             }
         }
+    }
+    public int getClearMoney(){
+        return getConfig().getInt("洗练消耗",10000);
+    }
+
+    public void loadRarity(){
+        LinkedList<Rarity> rarities = new LinkedList<>();
+        List<Map> list = getConfig().getMapList("稀有度");
+        if(list.size() == 0){
+            list = Rarity.ras;
+        }
+        for(Map map:list){
+            rarities.add(new Rarity(map.get("名称").toString(),map.get("随机范围").toString()));
+        }
+        rarity = rarities;
+    }
+
+
+    public Rarity getLevelUpByString(int up){
+        if(rarity.size() > up){
+            return rarity.get(up);
+        }
+        return new Rarity("???","0-1");
     }
 }

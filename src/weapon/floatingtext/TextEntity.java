@@ -66,7 +66,7 @@ public class TextEntity extends Entity {
             this.updateMovement();
         }
 
-        if (this.age > 30 || this.isCollided){
+        if (this.age > 60 || this.isCollided){
             this.kill();
             hasUpdate = true;
         }

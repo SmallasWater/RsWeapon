@@ -39,6 +39,8 @@ public class Weapon extends BaseItem {
 
     private boolean unBreak;
 
+    private boolean canShow = false;
+
 
 
     private static String tagName = "RsWeapon_Weapon";
@@ -103,6 +105,10 @@ public class Weapon extends BaseItem {
         }
         return null;
     }
+    
+    public int getFinalDamage(){
+        return new Random().nextInt((this.getMax()) + (this.getMin()));
+    }
 
     public LinkedList<GemStone> getGemStones() {
         return gemStoneLinkedList;
@@ -141,7 +147,7 @@ public class Weapon extends BaseItem {
         this.message = message;
     }
 
-    private static Weapon toWeapon(String name){
+    public static Weapon toWeapon(String name){
         Config config = new Config(RsWeapon.getInstance().getWeaponFile()+"/"+name+".yml");
         String id = config.getString("武器外形");
         Item item = BaseItem.toItemByMap(id);
@@ -181,6 +187,19 @@ public class Weapon extends BaseItem {
 
         String deathMessage = config.getString("击杀提示");
         Weapon weapon = new Weapon(item,min,max,kick,level,count,un,deathMessage);
+        Object up = config.get("稀有度");
+        int levelUp = 0;
+        if(up != null){
+            if(up instanceof String){
+                if("x".equals(up.toString().toLowerCase())){
+                    levelUp = new Random().nextInt(RsWeapon.rarity.size());
+                    weapon.setCanUp(true);
+                }
+            }else if(up instanceof Integer){
+                levelUp = (int) up;
+            }
+        }
+        weapon.setLevelUp(levelUp);
         weapon.setRpgAttribute(rpgAttribute);
         weapon.setRpgPF(rpgPF);
         weapon.setRpgLevel(rpgLevel);
@@ -188,7 +207,18 @@ public class Weapon extends BaseItem {
         weapon.setType(type);
         weapon.setName(name);
         weapon.setMoney(money);
+        weapon.setLevelUp(config.getInt("稀有度"));
+        weapon.setCanShow(config.getBoolean("是否在创造背包显示",false));
         return weapon;
+    }
+
+    public void setCanShow(boolean canShow) {
+        this.canShow = canShow;
+    }
+
+
+    public boolean isCanShow() {
+        return canShow;
     }
 
     @Override
@@ -275,6 +305,7 @@ public class Weapon extends BaseItem {
     @Override
     public String[] lore(){//13
         ArrayList<String> lore = new ArrayList<>();
+        lore.add("§r§2稀有度:  §r"+RsWeapon.getInstance().getLevelUpByString(levelUp).getName());
         lore.add("§r§f═§7╞════════════╡§f═");
         if(master != null){
             lore.add("§r§6◈§a§l主人: §e"+master);
@@ -311,6 +342,18 @@ public class Weapon extends BaseItem {
         reload(tag);
     }
 
+    @Override
+    public boolean toRarity() {
+        CompoundTag tag = item.getNamedTag();
+        int r = new Random().nextInt(RsWeapon.rarity.size());
+        Rarity rarity = RsWeapon.getInstance().getLevelUpByString(r);
+        tag.putIntArray(Weapon.tagName+"levelUp",new int[]{r
+                ,rarity.getRound((min))
+                ,rarity.getRound(max)});
+        item.setNamedTag(tag);
+        return true;
+    }
+
     private void reload(CompoundTag tag){
         Weapon weapon = Weapon.getInstance(name);
         if(weapon != null){
@@ -323,6 +366,7 @@ public class Weapon extends BaseItem {
             this.type = weapon.type;
             this.deathMessage = weapon.deathMessage;
             this.message = weapon.message;
+            this.canShow = weapon.canShow;
             this.unBreak = weapon.unBreak;
             this.rpgAttribute = weapon.rpgAttribute;
             this.rpgLevel = weapon.rpgLevel;
@@ -337,17 +381,22 @@ public class Weapon extends BaseItem {
             if(tag.contains(tagName+"master")){
                 this.master = tag.getString(tagName+"master");
             }
+            if(tag.contains(tagName+"levelUp")){
+                int[] tag1 = tag.getIntArray(tagName+"levelUp");
+                int lup = tag1[0];
+                int aup = tag1[1];
+                int hup = tag1[2];
+                this.min += aup;
+                this.max += hup;
+                this.levelUp = lup;
+            }
             if(tag.contains(tagName+"upData")){
                 for(int level = 1;level <= tag.getInt(tagName+"upData");level++){
-                    int add =  RsWeapon.getInstance().getUpDataAttribute();
-                    if(add > 0){
-                        if(this.kick >= 1.5){
-                            this.kick = 1.5;
-                        }else{
-                            this.kick += ((float) add / 10);
-                        }
-                        this.min += add;
-                        this.max += add;
+                    int add1 =  RsWeapon.getInstance().getUpDataAttribute(min);
+                    int add2 =  RsWeapon.getInstance().getUpDataAttribute(max);
+                    if(add1 > 0 && add2 > 0){
+                        this.min += add1;
+                        this.max += add2;
                     }
                 }
             }
@@ -455,7 +504,7 @@ public class Weapon extends BaseItem {
     @Override
     public boolean upData(Player player){
         int money = (int) EconomyAPI.getInstance().myMoney(player);
-        if(money < RsWeapon.getInstance().getUpDataMoney()){
+        if(money < RsWeapon.getInstance().getUpDataMoney(levelUp)){
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             player.sendMessage("§r§c抱歉 您的金钱不足 无法强化");
             player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
@@ -465,7 +514,7 @@ public class Weapon extends BaseItem {
                 player.sendMessage("§r§c抱歉 此武器无法强化");
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
             }else{
-                EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(),true);
+                EconomyAPI.getInstance().reduceMoney(player,RsWeapon.getInstance().getUpDataMoney(levelUp),true);
                 toUpData(tagName);
                 player.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                 player.sendMessage("§r§e恭喜 武器强化成功");

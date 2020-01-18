@@ -1,19 +1,16 @@
 package weapon.commands;
 
-
-
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
+import me.onebone.economyapi.EconomyAPI;
+import weapon.RsWeapon;
 import weapon.items.BaseItem;
 
-
-public class UpDataCommand extends Command {
-
-    public UpDataCommand(String name) {
-        super(name,"装备强化","/强化 help",new String[]{"强化"});
-
+public class ClearCommand extends Command{
+    public ClearCommand(String name) {
+        super(name,"武器 & 盔甲 洗练","/cw help");
     }
 
     @Override
@@ -23,19 +20,27 @@ public class UpDataCommand extends Command {
             BaseItem item1 = BaseItem.getBaseItem(item);
             if(item1 != null){
                 if(item1.isWeapon() || item1.isArmor()){
-                    if(item1.upData((Player) commandSender)){
-                        ((Player) commandSender).getInventory().setItemInHand(item1.toItem());
+                    if(EconomyAPI.getInstance().myMoney(commandSender.getName()) >= RsWeapon.getInstance().getClearMoney()){
+                        EconomyAPI.getInstance().reduceMoney(commandSender.getName(),RsWeapon.getInstance().getClearMoney());
+                        if(item1.toRarity()){
+                            ((Player) commandSender).getInventory().setItemInHand(item1.toItem());
+                            commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                            commandSender.sendMessage("§r§d[洗练系统]§b洗练成功!");
+                            commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
+                        }
+
+//
                         return true;
                     }else{
                         commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-                        commandSender.sendMessage("§r§c强化失败");
+                        commandSender.sendMessage("§r§d[洗练系统]§c洗练失败 金钱不足");
                         commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
                         return true;
                     }
                 }
             }
             commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
-            commandSender.sendMessage("§r§c请手持 武器 或 盔甲");
+            commandSender.sendMessage("§r§d[洗练系统]§c请手持 武器 或 盔甲");
             commandSender.sendMessage("§r§c▂§6▂§e▂§a▂§b▂§a▂§e▂§6▂§c▂");
         }
         return true;
