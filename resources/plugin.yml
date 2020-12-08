@@ -1,0 +1,11 @@
+name: RSWeapon
+main: weapon.RsWeapon
+version: 1.9.1.1
+author: 若水
+api: 1.0.8
+load: POSTWORLD
+loadbefore:
+  - EconomyAPI
+  - LevelAwakenSystem
+
+
