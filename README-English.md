@@ -11,11 +11,17 @@
 ------
 ##Function
 -[x] high damage items
+
 -[x] custom item enchant
+
 -[x] armor system
+
 -[x] gemstone mosaic system
+
 -[x] reinforcement system
+
 -[x] docking RPG rating system
+
 -[x] skill system
 ##Usage
 >/ we help main command (OP)
