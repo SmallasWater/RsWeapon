@@ -2,7 +2,7 @@
     <img src="https://img.shields.io/github/v/release/SmallasWater/RsWeapon?include_prereleases" alt="Latest release">
 </a>
 <a href="https://github.com/SmallasWater/RsWeapon/blob/master/README-English.md" alt="english">
-    <img src="https://img.shields.io/github/v/release/SmallasWater/RsWeapon?include_prereleases" alt="english">
+    <img src="https://img.shields.io/badge/language-english-1" alt="english">
 </a>
 
 # RsWeapon
